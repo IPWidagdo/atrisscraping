@@ -1,4 +1,4 @@
 # atrisscraping
 
 Half done. 
-Ongoing project: date searching.
+Ongoing project: price searching.
