@@ -1,0 +1,123 @@
+CGK-KDI 311018
+
+{"from_code":"CGK",
+"to_code":"KDI",
+"return_code":"",
+"from_date":1540918800,
+"to_date":1540918800,
+"total_passenger":1,
+"depart_schedule":
+		[{"journey_sell_key":"QG~ 332~ ~~CGK~10\/31\/2018 14:30~KDI~10\/31\/2018 19:20~UPG",
+		"route":"CGK-KDI",
+		"flight":"QG 332",
+		"time_depart":"1540971000",
+		"time_arrive":"1540988400",
+		"str_time":"14:30 19:20",
+		"str_date":"31-Oct-2018",
+		"longdate":1540988400,
+		"weekday":"WED","0":
+				{"class":"H",
+				"fare_sell_key":"0~H~~H~RGFR~~2~X",
+				"value":"0#H##H#RGFR##2#X@QG#*332#*##CGK#10\/31\/2018*14:30#KDI#10\/31\/2018*19:20#UPG@OW",
+				"seat":9},"1":
+				{"class":"G",
+				"fare_sell_key":"0~G~~G~RGFR~~2~X",
+				"value":"0#G##G#RGFR##2#X@QG#*332#*##CGK#10\/31\/2018*14:30#KDI#10\/31\/2018*19:20#UPG@OW",
+				"seat":9},"2":
+				"route_flight":1,
+				"class_list":
+						{"promo":[],	
+						"economy":["R","Z","Q","P","O","N","M","L","K","H","G","F","E","D","B","A"],
+						"business":[],
+						"no-class":[]}}}
+
+BDO-SUB 311018
+
+{"from_code":"BDO",
+"to_code":"SUB",
+"return_code":"",
+"from_date":1540918800,
+"to_date":1540918800,
+"total_passenger":1,
+"depart_schedule":
+		[{"journey_sell_key":"QG~ 825~ ~~BDO~10\/31\/2018 17:50~SUB~10\/31\/2018 19:20~",
+		"route":"BDO-SUB",
+		"flight":"QG 821",
+		"time_depart":"1540945500",
+		"time_arrive":"1540950900",
+		"str_time":"07:25 08:55",
+		"str_date":"31-Oct-2018",
+		"longdate":1540950900,
+		"weekday":"WED","0":
+				{"class":"H",
+				"fare_sell_key":"0~H~~H~RGFR~~1~X",
+				"value":"0#H##H#RGFR##1#X@QG#*821#*##BDO#10\/31\/2018*07:25#SUB#10\/31\/2018*08:55#@OW",
+				"seat":9},"1":
+				{"class":"G",
+				"fare_sell_key":"0~G~~G~RGFR~~1~X",
+				"value":"0#G##G#RGFR##1#X@QG#*821#*##BDO#10\/31\/2018*07:25#SUB#10\/31\/2018*08:55#@OW",
+				"seat":9},"2":}],
+				"route_flight":1,
+				"class_list":{"promo":[],
+						"economy":["R","Z","Q","P","O","N","M","L","K","H","G","F","E","D","B","A"],
+						"business":[],
+						"no-class":[]}}}
+
+PKU-CGK311018
+
+{"from_code":"PKU",
+"to_code":"CGK",
+"return_code":"",
+"from_date":1540918800,
+"to_date":1540918800,
+"total_passenger":1,
+"depart_schedule":
+		[{"journey_sell_key":"QG~ 939~ ~~PKU~10\/31\/2018 19:45~CGK~10\/31\/2018 21:40~",
+		"route":"PKU-CGK",
+		"flight":"QG 937",
+		"time_depart":"1540965900",
+		"time_arrive":"1540972800",
+		"str_time":"13:05 15:00",
+		"str_date":"31-Oct-2018",
+		"longdate":1540972800,
+		"weekday":"WED","0":
+				{"class":"O",
+				"fare_sell_key":"0~O~~O~RGFR~~1~X",
+				"value":"0#O##O#RGFR##1#X@QG#*937#*##PKU#10\/31\/2018*13:05#CGK#10\/31\/2018*15:00#@OW",
+				"seat":9},"1":
+				{"class":"N",
+				"fare_sell_key":"0~N~~N~RGFR~~1~X",
+				"value":"0#N##N#RGFR##1#X@QG#*937#*##PKU#10\/31\/2018*13:05#CGK#10\/31\/2018*15:00#@OW",
+				"seat":9},"2":}],
+				"route_flight":1,
+				"class_list":{"promo":[],
+						"economy":["R","Z","Q","P","O","N","M","L","K","H","G","F","E","D","B","A"],
+						"business":[],
+						"no-class":[]}}}
+
+SUB-PKU301118
+
+{"from_code":"SUB",
+"to_code":"PKU",
+"return_code":"",
+"from_date":1543510800,
+"to_date":1543510800,
+"total_passenger":1,
+"depart_schedule":[{"journey_sell_key":"QG~ 727~ ~~SUB~11\/30\/2018 21:15~CGK~11\/30\/2018 22:50~^QG~ 936~ ~~CGK~12\/01\/2018 05:25~PKU~12\/01\/2018 07:15~",
+		"route":"SUB-BTH##BTH-PKU",
+		"flight":"QG 946##QG 932",
+		"time_depart":"1543533600##1543548600",
+		"time_arrive":"1543542000##1543552200",
+		"str_time":"06:20##10:30 08:40##11:30",
+		"str_date":"30-Nov-2018",
+		"longdate":1543542000,
+		"weekday":"FRI","0":
+				{"class":"G##G",
+				"fare_sell_key":"0~G~~G~RGFR~~1~X^0~G~~G~RGFR~~1~X",
+				"value":"0#G##G#RGFR##1#X^0#G##G#RGFR##1#X@QG#*946#*##SUB#11\/30\/2018*06:20#BTH#11\/30\/2018*08:40#^QG#*932#*##BTH#11\/30\/2018*10:30#PKU#11\/30\/2018*11:30#@OW",
+				"seat":"9##9"},"1":}],
+				"route_flight":1,
+				"class_list":{"promo":[],
+						"economy":["R","Z","Q","P","O","N","M","L","K","H","G","F","E","D","B","A"],
+						"business":[],
+						"no-class":["G##G","K##F","K##E","K##D","K##B","K##A","F##F","E##E","D##D","F##H","B##B","E##G","A##A"]}}}

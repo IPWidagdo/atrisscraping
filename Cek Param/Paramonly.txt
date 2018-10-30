@@ -1,0 +1,26 @@
+CGK-KDI 311018
+
+from_code:
+to_code:
+return_code:
+from_date:
+to_date:
+total_passenger:
+depart_schedule:[{journey_sell_key: 
+	route: 
+	flight: 
+	time_depart: 
+	time_arrive:
+	str_time:
+	str_date:
+	longdate:
+	weekday:
+	class:
+	fare_sell_key:
+	value:
+	seat:
+	route_flight:
+	class_list:{"promo":[],
+				"economy":[],
+				"business":[],
+				"no-class":[]

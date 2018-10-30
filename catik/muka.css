@@ -1,0 +1,14 @@
+html, body {
+  max-width: 1200px;
+  margin: auto;
+  font-family: "Space Mono", sans-serif;
+  font-size: 18px;
+  line-height: 1.4em;
+  color: GhostWhite;
+}
+body {
+  background-image: url("../img/space.jpg");
+  height: 100%;
+  background-attachment: fixed;
+  background-size: cover;
+}
