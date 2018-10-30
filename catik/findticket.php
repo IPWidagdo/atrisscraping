@@ -51,14 +51,23 @@
 													$tax = $newFare['content']['tax'];
 													//$all_result = $newFare['content']['all_result'];
 													//var_dump($newFare);
-													if(preg_replace('/[^\da-z]/i', '', $total) == preg_replace('/[^\da-z]/i', '', $_POST['harga'])){
+													if (preg_replace('/[^\da-z]/i', '', $total) == preg_replace('/[^\da-z]/i', '', $_POST['harga'])){
 														$newBooking = $airlines->getBooking($_POST['fname'], $_POST['lname'], $_POST['email'], $_POST['phone_number0'], 
 															$value, $dateBook, $_POST['berangkat'], $flight_id, $_POST['datang'], $class_code, $publish, 
 															$tax, $total, $time_depart, $time_arrive);
-														}else echo("Price not found."); 			
+														break;
+													} else if (  abs ( preg_replace('/[^\da-z]/i', '', $total) - (int)preg_replace('/[^\da-z]/i', '', $_POST['harga']) ) <= 50000  ){
+														$response_harga['status'] = "CONFIRM";
+														$response_harga['message'] = "Ditemukan harga lain sebesar ". $total .". ";
+														$response_harga['total'] = $total;
+														//$airlines->logout();
+														echo json_encode($response_harga);
+														break;
 
-													break;
-											} else break;
+													} 
+													
+											} else { echo("Price not found."); break; }
+
 											$i++;
 										}
 									}
