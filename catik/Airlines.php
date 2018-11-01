@@ -8,14 +8,23 @@ class Airlines {
 
 	public $session;
 
-	function __construct() {
+	function __construct($session_id = null) {
 		set_time_limit(0);
-		
+
+		if (is_null($session_id)) 
+			$this->session_id = date("Y-m-d-H-i-s") . uniqid();		
+		else
+			$this->session_id = $session_id;
+
+		$this->session_file = dirname(__FILE__) ."/" . $this->session_id ."cookies.txt";
+		//$this->session_file = dirname(__FILE__) ."/cookies.txt";
+
 		$this->session = curl_init();
 		curl_setopt($this->session, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($this->session, CURLOPT_COOKIEFILE, "C:\xampp\htdocs\ngecek\atriscurl\cookie.txt");
-		curl_setopt($this->session, CURLOPT_COOKIEJAR, "C:\xampp\htdocs\ngecek\atriscurl\cookie.txt");
+		curl_setopt($this->session, CURLOPT_COOKIEFILE, $this->session_file);
+		curl_setopt($this->session, CURLOPT_COOKIEJAR, $this->session_file);
 		curl_setopt($this->session, CURLOPT_RETURNTRANSFER, true);
+		echo "session file " . $this->session_file ."<br/>";
 		//ob_start();  
 		//$this->tmp_void = fopen('php://output', 'w');
 
@@ -24,10 +33,11 @@ class Airlines {
 
 	}
 
-	function __destruct() {
-		//fclose($this->tmp_void);  
-		//$debug = ob_get_clean();
-		//echo $debug;
+	function saveSession() {
+		if (gettype($this->session) == 'resource') curl_close($this->session);
+		else var_dump($this->session);
+
+		return $this->session_id;
 	}
 
 	function setUserNamePassword($username, $password) {
@@ -67,62 +77,39 @@ class Airlines {
 		curl_close($this->session);
 		fwrite($fplo, $datalo);
 
+		unlink($this->session_file);
 		return $data_json;
+
 	}
 
-	function getAvailability($depart_date, $origin, $destination) {
-		// citilink api
+	function getAvailability($depart_date, $origin, $destination, $adult, $child, $infant) {
 		$fplcitiapi = fopen ('citilinkapi.html', 'w+');
 		$urlcitiapi = "https://atris.versatiket.co.id/api/bookingairlines/citilinkapi";
 
 		curl_setopt($this->session, CURLOPT_URL, $urlcitiapi);
-		//curl_setopt($this->session, CURLOPT_FILE, $fplcitiapi);
-		curl_setopt($this->session, CURLOPT_POSTFIELDS,"adult=". 1 . "&child=". 0 . "&infant=". 0 . "&from_code=". $origin ."&to_code=". $destination ."&from_date=". $depart_date ." & to_date=". $depart_date ." & return_code=");
+		curl_setopt($this->session, CURLOPT_POSTFIELDS,"adult=". $adult . "&child=". $child . "&infant=". $infant . "&from_code=". $origin ."&to_code=". $destination ."&from_date=". $depart_date ." & to_date=". $depart_date ." & return_code=");
 
 		$datacitiapi = curl_exec($this->session);
 		$data_json = json_decode($datacitiapi, true);
 		fwrite($fplcitiapi, $datacitiapi);
-		//var_dump($depart_date, $datacitiapi, $data_json);
+
 		return $data_json;
 
 	}
-
-/*
-	function searchPrice($harga){
-		$tickets = $this->getAvailability();
-		$ticket = array_values($tickets);
-		$origin = $ticket[2]['from_code']; 	
-		$class_listE = $ticket[2][['class_list'][['promo']['economy']]];
-		$class_listNC = $ticket[2][['class_list'][['promo']['no_class']]];
-		$destination = $ticket[2]['to_code'];
-		$depart_date = $ticket[2]['from_date'];
-
-		foreach ($class_listE as $key) {
-			$key{
-				return $key;
-			}
-				elseif (foreach ($class_lisNC as $key) {
-					if($key == harga){
-						return $key;
-					}
-			}
-
-	}
-*/	
 
 	function atrisUrlEncode($params) {
 		$params = str_replace("%7E", "~", str_replace("%2A", "*", urlencode($params)));
 		return $params;
 	}
 
-	function getFare($value, $depart_date, $origin, $flightID, $destination, $class_code, $from_date, $to_date, $seq) {	
+	function getFare($value, $depart_date, $origin, $flightID, $destination, $class_code, $from_date, $to_date, $seq, $adult_passenger_num, $child_passenger_num, $infant_passenger_num) {	
 		//$flight_ID = preg_replace(' ', '  ', $flightID);
 
 		$fplcitilinkapifare = fopen ('citilinkapifare.html', 'w+');
 		$urlcitilinkapifare = "https://atris.versatiket.co.id/api/bookingairlines/ajaxcitilinkapifare";
 
 		curl_setopt($this->session, CURLOPT_URL, $urlcitilinkapifare);
-		$postFare = "id=3400"."&choice=".$this->atrisUrlEncode($value)."&date=".$to_date."&from_date=".$from_date."&to_date=".$to_date."&from_code=".$origin."&to_code=".$destination."&adult=". 1 ."&child=". 0 ."&infant=". 0 ."&row=3400"."&class_code=".$class_code."&chkbox=3400"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~CitilinkAPI|3400|" . $flightID . "|" . $origin . "-" . $destination . "|1|" . $from_date . "|" . $to_date . "~" . $class_code . "~" . $value . "~0|0|0");
+		$postFare = "id=3400"."&choice=".$this->atrisUrlEncode($value)."&date=".$to_date."&from_date=".$from_date."&to_date=".$to_date."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3400"."&class_code=".$class_code."&chkbox=3400"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~CitilinkAPI|3400|" . $flightID . "|" . $origin . "-" . $destination . "|1|" . $from_date . "|" . $to_date . "~" . $class_code . "~" . $value . "~0|0|0");
 			//curl_setopt($this->session, CURLOPT_FILE, $fplcitilinkapifare);
 			curl_setopt($this->session, CURLOPT_POSTFIELDS, $postFare);
 		
@@ -134,18 +121,17 @@ class Airlines {
 		//var_dump($value, $depart_date, $origin, $flightID, $destination, $class_code, $from_date, $to_date);
 		return $data_json;
 
-
-		
 	}
 
-	function getBooking($fname, $lname, $email, $phone_number0, $value, $depart_date, $origin, $flightID, $destination, $class_code, $publish, $tax, $total, $from_date, $to_date){
+	function getBooking($data_penumpang, $email, $phone_number0, $value, $depart_date, $origin, $flight_id, $destination, $class_code, $publish, $tax, $total, $from_date, $to_date, $passenger_num){
 		//var_dump($flightID);
 		$depart_date = new DateTime($depart_date);
 		$monthFirst = $depart_date->format('m-d-Y');
 		$dayFirst = $depart_date->format('d-m-Y');
 		$yearFirst = $depart_date->format('Y-m-d');
 		$epochdate = $depart_date->format('U');
-		$flight_ID = str_replace('/\s+/', '  ', $flightID);
+		$flight_id = str_replace('/\s+/', '  ', $flight_id);
+		$passenger_num = ((int)$_POST['adult_passenger_num'] + (int)$_POST['child_passenger_num'] + (int)$_POST['infant_passenger_num']);
 		//var_dump($flightID, $flight_ID);
 		//$tax = number_format ((float) $tax);
 		//$publish = number_format ((float) $publish);
@@ -155,8 +141,43 @@ class Airlines {
 
 		$fplcitilinkbooking = fopen ('citilinkbooking.html', 'w+');
 		$urlcitilinkbooking = "https://atris.versatiket.co.id/api/bookingairlines/booking";
-		$postBook = "route=3400"."&from_code=".$origin."&to_code=". $destination ."&return_code="."&from_date=".$dayFirst."&to_date=". $dayFirst."&count_passenger=". 1 ."&adult=". 1 ."&child=". 0 ."&infant=". 0 ."&passenger_title0=Mr"."&name0=".$fname."&surname0=".$lname."&identify0=-1"."&date0=".$dob_default."&infant_parent0="."&passport0="."&expired0="."&passport_issuing0=ID"."&country0=ID"."&baggage0="."&baggage_jetstar0="."&baggage_jetstarapi0="."&baggage_airasia_dep0="."&baggage_firefly_dep0="."&baggage_tigerindonesia0="."&baggage_airasia_ret0="."&baggage_jetstarapi_ret0="."&baggage_firefly_ret0="."&passenger_type0=Adult"."&contact_title=Mr"."&contact_name=".$fname."&contact_surname=".$lname."&email=".$this->atrisUrlEncode($email)."&phone_code0=62"."&phone_area0=".substr($phone_number0, 0, 3)."&phone_number0=".$phone_number0."&phone_type0=Mobile"."&phone_code1=62"."&phone_area1="."&phone_number1="."&phone_type1=Home"."&check_box3400=" . $this->atrisUrlEncode("1~CitilinkAPI|3400|". $flight_ID . "|" . $origin . "-" . $destination . "|1|" . $from_date . "|" . $to_date .  "~" . $class_code . "~" . $value. "~" . $publish . "|" . $tax .  "|" . $total . "|IDR|IDR")  ;
+		//$postBook = "route=3400"."&from_code=".$origin."&to_code=". $destination ."&return_code="."&from_date=".$dayFirst."&to_date=". $dayFirst."&count_passenger=". $passenger_num ."&adult=". 1 ."&child=". 0 ."&infant=". 0 ."&passenger_title0=Mr"."&name0=".$fname."&surname0=".$lname."&identify0=-1"."&date0=".$dob_default."&infant_parent0="."&passport0="."&expired0="."&passport_issuing0=ID"."&country0=ID"."&baggage0="."&baggage_jetstar0="."&baggage_jetstarapi0="."&baggage_airasia_dep0="."&baggage_firefly_dep0="."&baggage_tigerindonesia0="."&baggage_airasia_ret0="."&baggage_jetstarapi_ret0="."&baggage_firefly_ret0="."&passenger_type0=Adult"."&contact_title=Mr"."&contact_name=".$fname."&contact_surname=".$lname."&email=".$this->atrisUrlEncode($email)."&phone_code0=62"."&phone_area0=".substr($phone_number0, 0, 3)."&phone_number0=".$phone_number0."&phone_type0=Mobile"."&phone_code1=62"."&phone_area1="."&phone_number1="."&phone_type1=Home"."&check_box3400=" . $this->atrisUrlEncode("1~CitilinkAPI|3400|". $flight_ID . "|" . $origin . "-" . $destination . "|1|" . $from_date . "|" . $to_date .  "~" . $class_code . "~" . $value. "~" . $publish . "|" . $tax .  "|" . $total . "|IDR|IDR")  ;
 
+		$postBook = "route=3400"."&from_code=".$origin."&to_code=". $destination ."&return_code="."&from_date=".$dayFirst."&to_date=". $dayFirst."&count_passenger=". $passenger_num ."&adult=".(int)$_POST['adult_passenger_num']."&child=". (int)$_POST['child_passenger_num'] ."&infant=". (int)$_POST['infant_passenger_num'];
+		
+		for ($i=0; $i<$passenger_num; $i++ ){
+			$postBook = $postBook. "&passenger_title".$i. "=" .$data_penumpang[$i]['title']; 
+			$postBook = $postBook. "&name".$i. "=" .$data_penumpang[$i]['fname']; 
+			$postBook = $postBook. "&surname".$i. "=" .$data_penumpang[$i]['lname'];
+			$postBook = $postBook. "&identify".$i. "=-1";
+			$postBook = $postBook. "&date".$i. "=".$dob_default; 
+			$postBook = $postBook. "&infant_parent".$i. "=";
+			$postBook = $postBook. "&passport". $i. "=";
+			$postBook = $postBook. "&passport_issuing". $i. "=ID";
+			$postBook = $postBook. "&country". $i. "=ID";
+			$postBook = $postBook. "&baggage". $i ."=";
+			$postBook = $postBook. "&baggage_jetstar". $i ."=";
+			$postBook = $postBook. "&baggage_jetstarapi". $i. "=";
+			$postBook = $postBook. "&baggage_airasia_dep". $i. "=";
+			$postBook = $postBook. "&baggage_firefly_dep". $i ."=";
+			$postBook = $postBook. "&baggage_tigerindonesia". $i. "=";
+			$postBook = $postBook. "&baggage_airasia_ret". $i. "=";
+			$postBook = $postBook. "&baggage_jetstarapi_ret". $i. "=";
+			$postBook = $postBook. "&baggage_firefly_ret". $i. "=";
+			$postBook = $postBook. "&passenger_type". $i. "=Adult";
+			$postBook = $postBook. "&baggage". $i. "=";
+			$postBook = $postBook. "&contact_title=Mr&contact_name=".$data_penumpang[$i]['fname']."&contact_surname=".$data_penumpang[$i]['lname'];
+			
+		}
+		$postBook = $postBook. "&email=".$this->atrisUrlEncode($email);
+		$postBook = $postBook. "&phone_code0"."=62";
+		$postBook = $postBook. "&phone_area0=".substr($phone_number0, 0, 3);
+		$postBook = $postBook. "&phone_number0=".$phone_number0;
+		$postBook = $postBook. "&phone_type0=Mobile";
+	//."&passenger_title0=Mr"."&name0=".$fname."&surname0=".$lname."&identify0=-1"."&date0=".$dob_default."&infant_parent0="."&passport0="."&expired0="."&passport_issuing0=ID"."&country0=ID"."&baggage0="."&baggage_jetstar0="."&baggage_jetstarapi0="."&baggage_airasia_dep0="."&baggage_firefly_dep0="."&baggage_tigerindonesia0="."&baggage_airasia_ret0="."&baggage_jetstarapi_ret0="."&baggage_firefly_ret0="."&passenger_type0=Adult"."&contact_title=Mr"."&contact_name=".$fname."&contact_surname=".$lname."&email=".$this->atrisUrlEncode($email)."&phone_code0=62"."&phone_area0=".substr($phone_number0, 0, 3)."&phone_number0=".$phone_number0."&phone_type0=Mobile"."&phone_code1=62"."&phone_area1="."&phone_number1="."&phone_type1=Home";
+
+		$postBook = $postBook. "&check_box3400=" . $this->atrisUrlEncode("1~CitilinkAPI|3400|". $flight_id . "|" . $origin . "-" . $destination . "|1|" . $from_date . "|" . $to_date .  "~" . $class_code . "~" . $value. "~" . $publish . "|" . $tax .  "|" . $total . "|IDR|IDR");
+		
 		curl_setopt($this->session, CURLOPT_URL, $urlcitilinkbooking);
 		//curl_setopt($this->session, CURLOPT_FILE, $fplcitilinkbooking);
 
@@ -164,7 +185,7 @@ class Airlines {
 
 		$datalab = curl_exec($this->session);
 		fwrite($fplcitilinkbooking, $datalab);
-
+		return json_decode($datalab);
 	}
 }
 ?>
