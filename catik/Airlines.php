@@ -102,7 +102,7 @@ class Airlines {
 		return $params;
 	}
 
-	function getFare($value, $depart_date, $origin, $flightID, $destination, $class_code, $from_date, $to_date, $seq, $adult_passenger_num, $child_passenger_num, $infant_passenger_num) {	
+	function getFare($value, $depart_date, $origin, $flightID, $destination, $class_code, $from_date, $to_date, $seq, $adult_passenger_num, $child_passenger_num, $infant_passenger_num){	
 		//$flight_ID = preg_replace(' ', '  ', $flightID);
 
 		$fplcitilinkapifare = fopen ('citilinkapifare.html', 'w+');
@@ -113,7 +113,7 @@ class Airlines {
 			//curl_setopt($this->session, CURLOPT_FILE, $fplcitilinkapifare);
 			curl_setopt($this->session, CURLOPT_POSTFIELDS, $postFare);
 		
-		//var_dump($postFare);
+		var_dump($postFare);
 
 		$datacitilinkapifare = curl_exec($this->session);
 		$data_json = json_decode($datacitilinkapifare, true);
@@ -132,12 +132,11 @@ class Airlines {
 		$epochdate = $depart_date->format('U');
 		$flight_id = str_replace('/\s+/', '  ', $flight_id);
 		$passenger_num = ((int)$_POST['adult_passenger_num'] + (int)$_POST['child_passenger_num'] + (int)$_POST['infant_passenger_num']);
+
 		//var_dump($flightID, $flight_ID);
 		//$tax = number_format ((float) $tax);
 		//$publish = number_format ((float) $publish);
 		//$total = number_format ((float) $total);
-
-		$dob_default = "29-10-2000";
 
 		$fplcitilinkbooking = fopen ('citilinkbooking.html', 'w+');
 		$urlcitilinkbooking = "https://atris.versatiket.co.id/api/bookingairlines/booking";
@@ -146,13 +145,45 @@ class Airlines {
 		$postBook = "route=3400"."&from_code=".$origin."&to_code=". $destination ."&return_code="."&from_date=".$dayFirst."&to_date=". $dayFirst."&count_passenger=". $passenger_num ."&adult=".(int)$_POST['adult_passenger_num']."&child=". (int)$_POST['child_passenger_num'] ."&infant=". (int)$_POST['infant_passenger_num'];
 		
 		for ($i=0; $i<$passenger_num; $i++ ){
+
+			$dob = new DateTime($data_penumpang[$i]['date_of_birth']);
+			$now   = new DateTime('today');
+			$passenger_age = $dob->diff($now)->y;
+			$date_of_birth = $dob->format('d-m-Y');
+
+
+			/*$dob = new DateTime($data_penumpang[$i]['date_of_birth']);
+			$dob = $dob->format('d-m-Y');
+			//$dob = strtotime($dob);
+			*/
+
+
+			/*$now = strtotime(date('d-m-Y'));
+			$now = new DateTime("@$now");
+			$now =  $now->format('m-d-Y');
+			*/
+
+
+			//$passenger_age_days = $now ->diff($dob); 
+			//echo $passenger_age_days->format('%R%a days');
+
+			
+			if ($passenger_age <= 12 && $passenger_age >= 2 ){
+				$type = "Child";
+			} elseif ($passenger_age < 2) {
+				$type = "Infant";
+			} else $type = "Adult";
+
 			$postBook = $postBook. "&passenger_title".$i. "=" .$data_penumpang[$i]['title']; 
 			$postBook = $postBook. "&name".$i. "=" .$data_penumpang[$i]['fname']; 
 			$postBook = $postBook. "&surname".$i. "=" .$data_penumpang[$i]['lname'];
 			$postBook = $postBook. "&identify".$i. "=-1";
-			$postBook = $postBook. "&date".$i. "=".$dob_default; 
-			$postBook = $postBook. "&infant_parent".$i. "=";
+			$postBook = $postBook. "&date".$i. "=".$date_of_birth;
+			if($type == "Infant"){
+				$postBook = $postBook. "&infant_parent". $i . "=". $i;	
+			} else {$postBook = $postBook. "&infant_parent". $i ."=";}
 			$postBook = $postBook. "&passport". $i. "=";
+			$postBook = $postBook. "&expired". $i. "=";
 			$postBook = $postBook. "&passport_issuing". $i. "=ID";
 			$postBook = $postBook. "&country". $i. "=ID";
 			$postBook = $postBook. "&baggage". $i ."=";
@@ -163,21 +194,22 @@ class Airlines {
 			$postBook = $postBook. "&baggage_tigerindonesia". $i. "=";
 			$postBook = $postBook. "&baggage_airasia_ret". $i. "=";
 			$postBook = $postBook. "&baggage_jetstarapi_ret". $i. "=";
-			$postBook = $postBook. "&baggage_firefly_ret". $i. "=";
-			$postBook = $postBook. "&passenger_type". $i. "=Adult";
-			$postBook = $postBook. "&baggage". $i. "=";
-			$postBook = $postBook. "&contact_title=Mr&contact_name=".$data_penumpang[$i]['fname']."&contact_surname=".$data_penumpang[$i]['lname'];
-			
+			$postBook = $postBook. "&baggage_firefly_ret". $i. "=";			
+			$postBook = $postBook. "&passenger_type". $i. "=" .$type;
 		}
+
+		$postBook = $postBook. "&contact_title=Mr&contact_name=".$data_penumpang[0]['fname']."&contact_surname=".$data_penumpang[0]['lname'];
 		$postBook = $postBook. "&email=".$this->atrisUrlEncode($email);
 		$postBook = $postBook. "&phone_code0"."=62";
 		$postBook = $postBook. "&phone_area0=".substr($phone_number0, 0, 3);
-		$postBook = $postBook. "&phone_number0=".$phone_number0;
-		$postBook = $postBook. "&phone_type0=Mobile";
+		$postBook = $postBook. "&phone_number0=".substr($phone_number0, 3, strlen($phone_number0));
+		$postBook = $postBook. "&phone_type0=Mobile&phone_code1=62&phone_area1=&phone_number1=&phone_type1=Home";
+		
 	//."&passenger_title0=Mr"."&name0=".$fname."&surname0=".$lname."&identify0=-1"."&date0=".$dob_default."&infant_parent0="."&passport0="."&expired0="."&passport_issuing0=ID"."&country0=ID"."&baggage0="."&baggage_jetstar0="."&baggage_jetstarapi0="."&baggage_airasia_dep0="."&baggage_firefly_dep0="."&baggage_tigerindonesia0="."&baggage_airasia_ret0="."&baggage_jetstarapi_ret0="."&baggage_firefly_ret0="."&passenger_type0=Adult"."&contact_title=Mr"."&contact_name=".$fname."&contact_surname=".$lname."&email=".$this->atrisUrlEncode($email)."&phone_code0=62"."&phone_area0=".substr($phone_number0, 0, 3)."&phone_number0=".$phone_number0."&phone_type0=Mobile"."&phone_code1=62"."&phone_area1="."&phone_number1="."&phone_type1=Home";
 
 		$postBook = $postBook. "&check_box3400=" . $this->atrisUrlEncode("1~CitilinkAPI|3400|". $flight_id . "|" . $origin . "-" . $destination . "|1|" . $from_date . "|" . $to_date .  "~" . $class_code . "~" . $value. "~" . $publish . "|" . $tax .  "|" . $total . "|IDR|IDR");
-		
+		var_dump($postBook);
+
 		curl_setopt($this->session, CURLOPT_URL, $urlcitilinkbooking);
 		//curl_setopt($this->session, CURLOPT_FILE, $fplcitilinkbooking);
 

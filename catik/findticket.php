@@ -18,7 +18,7 @@
 			<div><br>Harga : <input type="text" name="harga"></div>
 			<div><br>Flight ID : <input type="text" name="flightID"></div>
 			<div><br>
-			<div><br>
+			<div><br>		
 				Penumpang Dewasa:
 				<select name="adult_passenger_num">
 					<option value="0">0</option>
