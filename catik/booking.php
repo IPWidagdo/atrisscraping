@@ -42,8 +42,9 @@
 		
 	} 
 		
-	$newBooking = $airlines->getBooking($data_penumpang, $_POST['email'], $_POST['phone_number0'], $_POST['value'], $_POST['date_from'], $_POST['berangkat'], $_POST['flight_id'], $_POST['datang'], $_POST['class_code'], $_POST['publish'], $_POST['tax'], $_POST['total'], $_POST['time_depart'], $_POST['time_arrive'], $passenger_num);
-	echo json_encode($newBooking);
+	$newBooking = $airlines->getBooking ($data_penumpang, $_POST['email'], $_POST['phone_number0'], $_POST['value'], $_POST['date_from'], $_POST['berangkat'], $_POST['flight_id'], $_POST['datang'], $_POST['class_code'], $_POST['publish'], $_POST['tax'], $_POST['total'], $_POST['time_depart'], $_POST['time_arrive'], 
+		$passenger_num, $_POST['route'], $_POST['flight_id_ret'], $_POST['route_ret'], $_POST['date_ret'], $_POST['class_code_ret'], $_POST['value_ret'], $_POST ['publish_ret'], $_POST['tax_ret'], $_POST['total_ret'], $_POST['time_depart_ret'], $_POST['time_arrive_ret'], $_POST['time_depart'], $_POST['time_arrive']);
+		echo json_encode($newBooking);
 	$airlines->logout();
 	
 ?>
