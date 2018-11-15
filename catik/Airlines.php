@@ -186,8 +186,8 @@ class Airlines {
 				$time_arrive_ret0 = $time_arrive_ret_exp[0];
 				$time_arrive_ret1 = $time_arrive_ret_exp[1];
 		
-				$date_arranged_ret =  $time_depart_ret0 ."##" . $time_arrive_ret0 . "|" . $time_depart_ret1 . "##" . $time_arrive_ret1; 
-			} else {
+				$date_arranged_ret =  $time_depart_ret0 ."##". $time_arrive_ret0 . "|" . $time_depart_ret1 . "##" . $time_arrive_ret1; 
+			} else{
 				$date_arranged_ret = $time_depart_ret . "|" . $time_arrive_ret;
 			}
 
