@@ -6,7 +6,7 @@
 <body>
 <?php
 	require "Airlines.php";
-	//var_dump($_POST);
+	var_dump($_POST);
 
 	if (!array_key_exists('session_id', $_POST))
 	{
@@ -15,7 +15,7 @@
 	}
 
 	$airlines = new Airlines($session_id = $_POST['session_id']);
-	$airlines->setUserNamePassword("darwin", "Versa020874");
+	//$airlines->setUserNamePassword("darwin", "Versa020874");
 
 	if (!array_key_exists("adult_passenger_num", $_POST) || !array_key_exists("child_passenger_num", $_POST) && !array_key_exists("infant_passenger_num", $_POST)) {
 		echo '{"status" : "DENIED", "message" : "Parameternya kurang bos"}';
@@ -41,9 +41,14 @@
 		$data_penumpang[$i]["date_of_birth"] = $_POST['date_of_birth'.$i];
 		
 	} 
+
+	if ($_POST['flight_id_ret'] != NULL) {
+		$return_param = ["flight_id_ret" => $_POST['flight_id_ret'], "route_ret" => $_POST['route_ret'], "date_ret" => $_POST['date_ret'], "class_code_ret" => $_POST['class_code_ret'], "value_ret" => $_POST['value_ret'], "publish_ret" => $_POST['publish_ret'], "tax_ret" => $_POST['tax_ret'], "total_ret" => $_POST['total_ret'],"time_depart_ret" => $_POST['time_depart_ret'], "time_arrive_ret" => $_POST['time_arrive_ret']];
+
+	} else $return_param = NULL;
 		
 	$newBooking = $airlines->getBooking ($data_penumpang, $_POST['email'], $_POST['phone_number0'], $_POST['value'], $_POST['date_from'], $_POST['berangkat'], $_POST['flight_id'], $_POST['datang'], $_POST['class_code'], $_POST['publish'], $_POST['tax'], $_POST['total'], $_POST['time_depart'], $_POST['time_arrive'], 
-		$passenger_num, $_POST['route'], $_POST['flight_id_ret'], $_POST['route_ret'], $_POST['date_ret'], $_POST['class_code_ret'], $_POST['value_ret'], $_POST ['publish_ret'], $_POST['tax_ret'], $_POST['total_ret'], $_POST['time_depart_ret'], $_POST['time_arrive_ret'], $_POST['time_depart'], $_POST['time_arrive']);
+		$passenger_num, $_POST['route'], $_POST['time_depart'], $_POST['time_arrive'], $return_param);
 		echo json_encode($newBooking);
 	$airlines->logout();
 	

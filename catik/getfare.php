@@ -1,5 +1,6 @@
 <?php 
 require "Airlines.php";
+
 //var_dump($_POST);
 ?>
 
@@ -16,7 +17,7 @@ require "Airlines.php";
 		
 	$dateBook = $_POST['dateFrom'];	
 	$date_ret = $_POST['date_ret'];		
-	var_dump($date_ret);
+	// var_dump($date_ret);
 	$schedules = $airlines->getAvailability( $dateBook, $_POST['berangkat'], $_POST['datang'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $_POST['date_ret'], $_POST['flightID_ret']);
 	$schedule = $schedules['content']['depart_schedule'];
 	//$flight = $schedules['content']['depart_schedule']['flight']
@@ -54,6 +55,8 @@ require "Airlines.php";
     					$tax_ret = $newFare_ret['content']['tax'];
 						$total_ret = $newFare_ret['content']['total'];
 						//$all_result_ret = $newFare_ret['content']['all_result'];
+
+						
 
 						if (preg_replace('/[^\da-z]/i', '', $total_ret) == preg_replace('/[^\da-z]/i', '', $_POST['harga_ret'])){
 							$response_harga_ret['status'] = "RET SUCCESS";
@@ -150,36 +153,34 @@ $session_id = $airlines->saveSession();
 <body>
 	<form action="booking.php" method="post" margin=20%>
 		<div>
-			<div><input type="text" name="adult_passenger_num" readonly value="<?=$_POST['adult_passenger_num']?>" ></div>
-			<div><input type="text" name="child_passenger_num" readonly value="<?=$_POST['child_passenger_num']?>" ></div>
-			<div><input type="text" name="infant_passenger_num" readonly value="<?=$_POST['infant_passenger_num']?>" ></div>
-			<div><input type="text" name="date_from" readonly value="<?=$_POST['dateFrom']?>"></div>
-			<div><input type="text" name="date_ret" readonly value="<?=$_POST['date_ret']?>" ></div>
-			<div><input type="text" name="datang" readonly value="<?=$_POST['datang']?>" ></div>
-			<div><input type="text" name="berangkat" readonly value="<?=$_POST['berangkat']?>" ></div>
-			<div><input type="text" name="flight_id" readonly value="<?=$_POST['flightID']?>" ></div>
-			<div><input type="text" name="harga" readonly value="<?=$_POST['harga']?>" ></div>
-			<div><input type="text" name="price_ret" readonly value="<?=$_POST['harga_ret']?>" ></div>	
-			<div><input type="text" name="flight_id_ret" readonly value="<?=$_POST['flightID_ret']?>" ></div>
-			<div><input type="text" name="total" readonly value="<?=$total?>" ></div>
-			<div><input type="text" name="publish" readonly value="<?=$publish?>" ></div>
-			<div><input type="text" name="tax" readonly value="<?=$tax?>" ></div>
-			<div><input type="text" name="value" readonly value="<?=$value?>" ></div>
-			<div><input type="text" name="class_code" readonly value="<?=$class_code?>"></div>
-			<div><input type="text" name="route" readonly value="<?=$route?>" ></div>
-			<div><input type="text" name="time_depart" readonly value="<?=$time_depart?>" ></div>
-    		<div><input type="text" name="time_arrive" readonly value="<?=$time_arrive?>" ></div>
-			<div><input type="text" name="time_depart_ret" readonly value="<?=$time_depart_ret?>" ></div>
-    		<div><input type="text" name="time_arrive_ret" readonly value="<?=$time_arrive_ret?>" ></div>
-    		<div><input type="text" name="value_ret" readonly value="<?=$value_ret?>" ></div>
-    		<div><input type="text" name="route_ret" readonly value="<?=$route_ret?>" ></div> 
-    		<div><input type="text" name="publish_ret" readonly value="<?=$publish_ret?>" ></div>
-    		<div><input type="text" name="tax_ret" readonly value="<?=$tax_ret?>" ></div>
-    		<div><input type="text" name="total_ret" readonly value="<?=$total_ret?>" ></div>	
-    		<div><input type="text" name="class_code_ret" readonly value="<?=$class_code_ret?>" ></div> 		
-			<div><input type="text" name="session_id" readonly value="<?=$session_id?>" ></div>
-			<!-- <div><input type="text" name="all_result" readonly value="<?=$all_result?>" ></div>
-			<div><input type="text" name="all_result_ret" readonly value="<?=$all_result_ret?>" ></div> -->
+			<div><input type="hidden" name="adult_passenger_num" readonly value="<?=$_POST['adult_passenger_num']?>" ></div>
+			<div><input type="hidden" name="child_passenger_num" readonly value="<?=$_POST['child_passenger_num']?>" ></div>
+			<div><input type="hidden" name="infant_passenger_num" readonly value="<?=$_POST['infant_passenger_num']?>" ></div>
+			<div><input type="hidden" name="date_from" readonly value="<?=$_POST['dateFrom']?>"></div>
+			<div><input type="hidden" name="date_ret" readonly value="<?=$_POST['date_ret']?>" ></div>
+			<div><input type="hidden" name="datang" readonly value="<?=$_POST['datang']?>" ></div>
+			<div><input type="hidden" name="berangkat" readonly value="<?=$_POST['berangkat']?>" ></div>
+			<div><input type="hidden" name="flight_id" readonly value="<?=$_POST['flightID']?>" ></div>
+			<div><input type="hidden" name="harga" readonly value="<?=$_POST['harga']?>" ></div>
+			<div><input type="hidden" name="price_ret" readonly value="<?=$_POST['harga_ret']?>" ></div>	
+			<div><input type="hidden" name="flight_id_ret" readonly value="<?=$_POST['flightID_ret']?>" ></div>
+			<div><input type="hidden" name="total" readonly value="<?=$total?>" ></div>
+			<div><input type="hidden" name="publish" readonly value="<?=$publish?>" ></div>
+			<div><input type="hidden" name="tax" readonly value="<?=$tax?>" ></div>
+			<div><input type="hidden" name="value" readonly value="<?=$value?>" ></div>
+			<div><input type="hidden" name="class_code" readonly value="<?=$class_code?>"></div>
+			<div><input type="hidden" name="route" readonly value="<?=$route?>" ></div>
+			<div><input type="hidden" name="time_depart" readonly value="<?=$time_depart?>" ></div>
+    		<div><input type="hidden" name="time_arrive" readonly value="<?=$time_arrive?>" ></div>
+			<div><input type="hidden" name="session_id" readonly value="<?=$session_id?>" ></div>
+			<div><input type='hidden' name='time_depart_ret' readonly value='<?=$time_depart_ret?>' ></div>
+			<div><input type='hidden' name='time_arrive_ret' readonly value='<?=$time_arrive_ret?>'></div>
+			<div><input type='hidden' name='value_ret' readonly value='<?=$value_ret?>' ></div>
+			<div><input type='hidden' name='route_ret' readonly value='<?=$route_ret?>' ></div> 
+			<div><input type='hidden' name='publish_ret' readonly value='<?=$publish_ret?>' ></div>
+			<div><input type='hidden' name='tax_ret' readonly value='<?=$tax_ret?>' ></div>
+			<div><input type='hidden' name='total_ret' readonly value='<?=$total_ret?>' ></div>	
+			<div><input type='hidden' name='class_code_ret' readonly value='<?=$class_code_ret?>' ></div>;
 
 <?php
 	$passenger_num = ((int)$_POST['adult_passenger_num'] + (int)$_POST['child_passenger_num'] + (int)$_POST['infant_passenger_num']);
@@ -192,7 +193,7 @@ $session_id = $airlines->saveSession();
 	}
 ?>
 			<div><br>Email: <input type='text' name='email'></div>
-			<div><br>Telefon : <input type="text" name="phone_number0"></div>
+			<div><br>Telefon : <input type='text' name="phone_number0"></div>
 			<div><br><input type="submit" name="book" value="Book"></div>
 
 		</div>
