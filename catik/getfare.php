@@ -48,19 +48,23 @@ require "Airlines.php";
     						$iter1++;
     						continue;
 						} 
-						
+
 						$time_depart_ret = $flightdata1['time_depart'];
 						$time_arrive_ret = $flightdata1['time_arrive'];
 						$longdate_ret = $flightdata1['longdate']; 
 						$route_ret = $flightdata1['route'];
-						$newFare_ret = $airlines->getFareRet($value_ret, $date_ret, $_POST['datang'], $flight_id_ret, $_POST['berangkat'], $class_code_ret, $time_depart_ret, $time_arrive_ret, $iter1, $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $from_date, $to_date, $route_ret,$longdate_ret);
 						
-						//if(array_key_exists('total', $newFare_ret['content']) && array_key_exists('publish', $newFare_ret['content']) && array_key_exists('tax', $newFare_ret['content'])){
-							$publish_ret = $newFare_ret['content']['publish'];
-							$tax_ret = $newFare_ret['content']['tax'];
-							$total_ret = $newFare_ret['content']['total'];
-						//}
+						$newFare_ret = $airlines->getFareRet($value_ret, $date_ret, $_POST['datang'], $flight_id_ret, $_POST['berangkat'], $class_code_ret, $time_depart_ret, $time_arrive_ret, $iter1, $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $from_date, $to_date, $route_ret,$longdate_ret);
+
+						if(!array_key_exists('total', $newFare_ret['content']) || !array_key_exists('publish', $newFare_ret['content']) || !array_key_exists('tax', $newFare_ret['content'])){
+							$iter1++;
+    						continue;
+						}
+						
 						//$all_result_ret = $newFare_ret['content']['all_result'];
+						$publish_ret = $newFare_ret['content']['publish'];
+						$tax_ret = $newFare_ret['content']['tax'];
+						$total_ret = $newFare_ret['content']['total'];
 
 						if (preg_replace('/[^\da-z]/i', '', $total_ret) == preg_replace('/[^\da-z]/i', '', $_POST['harga_ret'])){
 							$response_harga_ret['status'] = "RET SUCCESS";
@@ -109,13 +113,18 @@ require "Airlines.php";
 					$time_arrive = $flightdata['time_arrive'];
 					$longdate = $flightdata['longdate'];
 					$route = $flightdata['route'];
+					
 					$newFare = $airlines->getFare($value, $dateBook, $_POST['berangkat'], $flight_id, $_POST['datang'], $class_code, $time_depart, $time_arrive, $iter, $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $from_date, $to_date, $route, $longdate);
-					//if(array_key_exists('total', $newFare['content']) && array_key_exists('publish', $newFare['content']) && array_key_exists('tax', $newFare['content'])){
-						$total = $newFare['content']['total'];			
-						$publish = $newFare['content']['publish'];
-						$tax = $newFare['content']['tax'];	
-					//}
+					
+					if(!array_key_exists('total', $newFare['content']) || !array_key_exists('publish', $newFare['content']) || !array_key_exists('tax', $newFare['content'])){
+						$iter++;
+						continue;
+					}
 					//$all_result = $newFare['content']['all_result'];					
+
+					$total = $newFare['content']['total'];			
+					$publish = $newFare['content']['publish'];
+					$tax = $newFare['content']['tax'];	
 
 					if (preg_replace('/[^\da-z]/i', '', $total) == preg_replace('/[^\da-z]/i', '', $_POST['harga'])){
 						$response_harga['status'] = "SUCCESS";

@@ -63,8 +63,17 @@ class Airlines {
 		} elseif (substr($flightID, 0, 2) == "JT" || substr($flightID, 0, 2) == "ID" || substr($flightID, 0, 2) == "OW" || substr($flightID, 0, 2) == "IW"){
 			$response = $this->scraping->request('lionh2h.html', 'https://atris.versatiket.co.id/api/bookingairlines/lionh2h', $postAvailability);
 			return $response;
-		} 
-		
+		}  elseif (substr($flightID, 0, 2) == "SJ" || substr($flightID, 0, 2) == "IN"){
+			$response = $this->scraping->request('sriwijayaapi.html', 'https://atris.versatiket.co.id/api/bookingairlines/sriwijayaapi', $postAvailability);
+			return $response;
+		} elseif (substr($flightID, 0, 2) == "GA"){
+			$response = $this->scraping->request('garudaapi.html', 'https://atris.versatiket.co.id/api/bookingairlines/garudaapi', $postAvailability);
+			return $response;
+		}
+		//  elseif (substr($flightID, 0, 2) == "GA"){
+		// 	$response = $this->scraping->request('garudaapialtea.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxkonsorsiumaltea', $postAvailability);
+		// 	return $response;
+		// }
 	}
 
 	function atrisUrlEncode($params) {
@@ -80,12 +89,29 @@ class Airlines {
 			return $response;
 
 		} elseif (substr($flightID, 0, 2) == "JT" || substr($flightID, 0, 2) == "ID" || substr($flightID, 0, 2) == "OW" || substr($flightID, 0, 2) == "IW"){
-			$postFare = "id=3000"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3400"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3000"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~LionH2H|3000|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
+			$postFare = "id=3000"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3000"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3000"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~LionH2H|3000|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
 			$response = $this->scraping->request('liongetfare.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxlionh2hfare', $postFare);
 			var_dump($postFare);
 			return $response;
+		}  elseif (substr($flightID, 0, 2) == "SJ" || substr($flightID, 0, 2) == "IN"){
+			$postFare = "id=3300"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3300"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3300"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~SriwijayaAPI|3300|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
+			$response = $this->scraping->request('sriwijayagetfare.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxsriwijayaapifare', $postFare);
+			var_dump($postFare);
+			return $response;
+		} elseif (substr($flightID, 0, 2) == "GA" ){
+			$postFare = "id=2200"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=2200"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=2200"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~GarudaAPI|2200|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
+			$response = $this->scraping->request('garudagetfare.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxgarudaapifare', $postFare);
+			var_dump($postFare);
+			return $response;
+		}
+		//  elseif (substr($flightID, 0, 2) == "GA" ){
+		// 	$postFare = "id=2800"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=2800"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=2800"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~KonsorsiumAltea|2800|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
+		// 	$response = $this->scraping->request('garudagetfarealtea.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxkonsorsiumalteafare', $postFare);
+		// 	var_dump($postFare);
+		// 	return $response;
 		} else echo "Salah parameter getfare kali ya? :/";
 	}
+
 
 	function getFareRet($value_ret, $depart_date_ret, $origin_ret, $flightID_ret, $destination_ret, $class_code_ret, $time_depart_ret, $time_arrive_ret, $seq_ret, $adult_passenger_num_ret, $child_passenger_num_ret, $infant_passenger_num_ret, $from_date, $to_date, $route_ret, $longdate_ret){	
 
@@ -96,10 +122,26 @@ class Airlines {
 			return $response;
 		
 		} elseif (substr($flightID_ret, 0, 2) == "JT" || substr($flightID_ret, 0, 2) == "ID" || substr($flightID_ret, 0, 2) == "OW" || substr($flightID_ret, 0, 2) == "IW"){
-			$postFare_ret = "id=3000"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=3000"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=3000"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~LionH2H|3000|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
+			$postFare_ret = "id=3050"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=3050"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=3050"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~LionH2H|3050|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
 			var_dump($postFare_ret);
 			$response = $this->scraping->request('liongetfareret.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxlionh2hfare', $postFare_ret);
 			return $response;
+		} elseif (substr($flightID_ret, 0, 2) == "SJ" || substr($flightID_ret, 0, 2) == "IN"){
+			$postFare_ret = "id=3350"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=3350"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=3350"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~SriwijayaAPI|3350|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
+			var_dump($postFare_ret);
+			$response = $this->scraping->request('sriwijayagetfareret.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxsriwijayaapifare', $postFare_ret);
+			return $response;
+		} elseif (substr($flightID_ret, 0, 2) == "GA"){
+			$postFare_ret = "id=2250"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=2250"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=2250"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~SriwijayaAPI|2250|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
+			var_dump($postFare_ret);
+			$response = $this->scraping->request('garudagetfareret.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxgarudaapifare', $postFare_ret);
+			return $response;
+		}
+		//  elseif (substr($flightID_ret, 0, 2) == "GA"){
+		// 	$postFare_ret = "id=2850"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=2850"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=2850"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~KonsorsiumAltea|2850|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
+		// 	var_dump($postFare_ret);
+		// 	$response = $this->scraping->request('garudagetfareretaltea.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxcitilinkapifare', $postFare_ret);
+		// 	return $response;
 		} else echo "Salah parameter getfareret kali ya? :/";
 	}
 
@@ -138,7 +180,23 @@ class Airlines {
 				$flightnumber_ret = "3050";
 				$flightnumber_dep = "3000";
 				$flight_code = "LionH2H";
-			}
+			} elseif(substr($flight_id, 0, 2) == "SJ" || substr($flight_id, 0, 2) == "IN"){
+				$route_rt = "%2C3350";
+				$flightnumber_ret = "3350";
+				$flightnumber_dep = "3300";
+				$flight_code = "SriwijayaAPI";
+			} elseif(substr($flight_id, 0, 2) == "GA"){
+				$route_rt = "%2C2250";
+				$flightnumber_ret = "2250";
+				$flightnumber_dep = "2200";
+				$flight_code = "GarudaAPI";
+			} 
+			// elseif(substr($flight_id, 0, 2) == "GA"){
+			// 	$route_rt = "%2C2850";
+			// 	$flightnumber_ret = "2850";
+			// 	$flightnumber_dep = "2200";
+			// 	$flight_code = "KonsorsiumAltea";
+			// }
 	
 			
 			$return_code = $_POST['berangkat'];
