@@ -109,7 +109,8 @@ class Airlines {
 		// 	$response = $this->scraping->request('garudagetfarealtea.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxkonsorsiumalteafare', $postFare);
 		// 	var_dump($postFare);
 		// 	return $response;
-		} else echo "Salah parameter getfare kali ya? :/";
+		//} 
+		else echo "Salah parameter getfare kali ya? :/";
 	}
 
 
@@ -142,7 +143,8 @@ class Airlines {
 		// 	var_dump($postFare_ret);
 		// 	$response = $this->scraping->request('garudagetfareretaltea.html', 'https://atris.versatiket.co.id/api/bookingairlines/ajaxcitilinkapifare', $postFare_ret);
 		// 	return $response;
-		} else echo "Salah parameter getfareret kali ya? :/";
+		//} 
+		else echo "Salah parameter getfareret kali ya? :/";
 	}
 
 	function getBooking($data_penumpang, $email, $phone_number0, $value, $depart_date, $origin, $flight_id, $destination, $class_code, $publish, $tax, $total, $from_date, $to_date, $passenger_num, $route, $time_depart, $time_arrive, $return_param){
@@ -311,6 +313,47 @@ class Airlines {
 		var_dump( $postBook);
 
 		$response = $this->scraping->request('citilinkbooking.html', 'https://atris.versatiket.co.id/api/bookingairlines/booking', $postBook);
+		return $response;
+	}
+	
+	function searchBook($begin_date, $end_date, $lastname, $book_code){
+	
+		if ($end_date == ""){
+			$end_date = date("d-m-Y");
+		}
+
+		if ($begin_date == ""){
+			$begin_date = date("d-m-Y")-3; 
+		}
+
+		$begin_date_day_first = date('d-m-Y',strtotime($begin_date));
+		$end_date_day_first = date('d-m-Y',strtotime($end_date));
+
+		if ($lastname != ""){
+			$search_choice = "passenger_name";
+			$seacrh_input = $lastname;
+		} elseif ($book_code != ""){
+			$search_choice = "booking_code";
+			$seacrh_input = $book_code;
+		} elseif ($lastname !="" && $book_code !=""){
+			echo "Inputnya yang bener, milih salah satu aja. -_-";
+		} elseif ($lastname =="" && $book_code ==""){
+			echo "Inputnya yang bener, belum diisi itu. -_-";
+		}
+		
+		var_dump($end_date, $begin_date);
+
+		$post_search = "closeBtn=Close&act_search=Find&option=per_pages&partial=1&status_choice=any&find_in=any&issued_start_date=" . $end_date_day_first . "&booking_start_date=". $end_date_day_first. "&start_date=". $end_date_day_first ."&column_choice=".$search_choice."&booking_end_periode_date=". $end_date_day_first ."&booking_start_periode_date=". $begin_date_day_first ."&search_txt=". $seacrh_input;
+		var_dump($post_search);
+
+		$response = $this->scraping->request('searchbook.html', 'https://atris.versatiket.co.id/api/ticketingairlines/search', $post_search);
+		
+		return $response;
+	}
+	function infoBook($booking_id){
+
+		$post_booking_id = "id=" . $booking_id;
+		$response = $this->scraping->request('detailbook.html', 'https://atris.versatiket.co.id/api/ticketingairlines/info', $post_booking_id);
 		return $response;
 	}
 }
