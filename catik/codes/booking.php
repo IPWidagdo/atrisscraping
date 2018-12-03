@@ -48,7 +48,7 @@
 	} else $return_param = NULL;
 		
 	$newBooking = $airlines->getBooking ($data_penumpang, $_POST['email'], $_POST['phone_number0'], $_POST['value'], $_POST['date_from'], $_POST['berangkat'], $_POST['flight_id'], $_POST['datang'], $_POST['class_code'], $_POST['publish'], $_POST['tax'], $_POST['total'], $_POST['time_depart'], $_POST['time_arrive'], 
-		$passenger_num, $_POST['route'], $_POST['time_depart'], $_POST['time_arrive'], $return_param);
+		$passenger_num, $_POST['route'], $_POST['time_depart'], $_POST['time_arrive'], $return_param, $_POST['date_ret']);
 		echo json_encode($newBooking);
 	$airlines->logout();
 	

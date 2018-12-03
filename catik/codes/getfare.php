@@ -6,7 +6,7 @@ require "Airlines.php";
 
 <?php 
 	$airlines = new Airlines();
-	$airlines->setUserNamePassword("darwin", "Versa020874");
+	$airlines->setUserNamePassword("gabon", "Csatversa123");
 	$response = $airlines->login();
 
 	if (isset($response['status']) && $response['status'] != 'success') {
@@ -116,6 +116,7 @@ require "Airlines.php";
 					
 					$newFare = $airlines->getFare($value, $dateBook, $_POST['berangkat'], $flight_id, $_POST['datang'], $class_code, $time_depart, $time_arrive, $iter, $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $from_date, $to_date, $route, $longdate);
 					
+
 					if(!array_key_exists('total', $newFare['content']) || !array_key_exists('publish', $newFare['content']) || !array_key_exists('tax', $newFare['content'])){
 						$iter++;
 						continue;
@@ -188,14 +189,18 @@ $session_id = $airlines->saveSession();
 			<div><input type="hidden" name="time_depart" readonly value="<?=$time_depart?>" ></div>
     		<div><input type="hidden" name="time_arrive" readonly value="<?=$time_arrive?>" ></div>
 			<div><input type="hidden" name="session_id" readonly value="<?=$session_id?>" ></div>
-			<div><input type='hidden' name='time_depart_ret' readonly value='<?=$time_depart_ret?>' ></div>
-			<div><input type='hidden' name='time_arrive_ret' readonly value='<?=$time_arrive_ret?>'></div>
-			<div><input type='hidden' name='value_ret' readonly value='<?=$value_ret?>' ></div>
-			<div><input type='hidden' name='route_ret' readonly value='<?=$route_ret?>' ></div> 
-			<div><input type='hidden' name='publish_ret' readonly value='<?=$publish_ret?>' ></div>
-			<div><input type='hidden' name='tax_ret' readonly value='<?=$tax_ret?>' ></div>
-			<div><input type='hidden' name='total_ret' readonly value='<?=$total_ret?>' ></div>	
-			<div><input type='hidden' name='class_code_ret' readonly value='<?=$class_code_ret?>' ></div>;
+			<?php if($_POST['flightID_ret'] != ""){
+				echo 
+				"<div><input type='hidden' name='time_depart_ret' readonly value='<?=$time_depart_ret?>'></div>
+				<div><input type='hidden' name='time_arrive_ret' readonly value='<?=$time_arrive_ret?>'></div>
+				<div><input type='hidden' name='value_ret' readonly value='<?=$value_ret?>' ></div>
+				<div><input type='hidden' name='route_ret' readonly value='<?=$route_ret?>' ></div> 
+				<div><input type='hidden' name='publish_ret' readonly value='<?=$publish_ret?>' ></div>
+				<div><input type='hidden' name='tax_ret' readonly value='<?=$tax_ret?>' ></div>
+				<div><input type='hidden' name='total_ret' readonly value='<?=$total_ret?>' ></div>	
+				<div><input type='hidden' name='class_code_ret' readonly value='<?=$class_code_ret?>' ></div>";
+			}?>
+		</div>
 
 <?php
 	$passenger_num = ((int)$_POST['adult_passenger_num'] + (int)$_POST['child_passenger_num'] + (int)$_POST['infant_passenger_num']);
