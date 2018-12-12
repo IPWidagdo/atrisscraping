@@ -1,5 +1,5 @@
 <?php	
-	if(isset($_POST['cari']) && isset ($_POST['berangkat']) && isset($_POST['datang']) && isset($_POST['harga']) && isset($_POST['dateFrom']) && isset($_POST['flightID']) && isset($_POST['adult_passenger_num']) && isset($_POST['child_passenger_num']) && isset($_POST['infant_passenger_num']) && isset($_POST['date_ret']) && isset($_POST['flightID_ret'])){
+	if(isset($_POST['cari']) && isset ($_POST['berangkat']) && isset($_POST['datang']) && isset($_POST['harga']) && isset($_POST['harga_ret']) && isset($_POST['dateFrom']) && isset($_POST['flightID']) && isset($_POST['adult_passenger_num']) && isset($_POST['child_passenger_num']) && isset($_POST['infant_passenger_num']) && isset($_POST['date_ret']) && isset($_POST['flightID_ret'])){
 		
 	}
 ?>

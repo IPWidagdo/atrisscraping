@@ -22,7 +22,7 @@
             curl_setopt($this->session, CURLOPT_VERBOSE, true);
             curl_setopt($this->session, CURLOPT_STDERR, $this->verbose = fopen('php://temp', 'rw+') );
             curl_setopt($this->session, CURLOPT_FILETIME, true);
-            echo "session file " . $this->session_file ."<br/>";
+            // echo "session file " . $this->session_file ."<br/>";
         }
 
         function request($pagename, $url, $post_var){
