@@ -87,7 +87,7 @@ class Airlines {
 	function getFare($value, $depart_date, $origin, $flightID, $destination, $class_code, $time_depart, $time_arrive, $seq, $adult_passenger_num, $child_passenger_num, $infant_passenger_num, $from_date, $to_date, $route, $longdate) {	
 		if(substr($flightID, 0, 2) == "QG"){
 			$postFare = "id=3400"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3400"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3400"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~CitilinkAPI|3400|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
-			// var_dump($postFare);
+			var_dump($postFare);
 			$response = $this->scraping->request('citilinkgetfare.html', $this->url . '/api/bookingairlines/ajaxcitilinkapifare', $postFare);
 			return $response;
 
@@ -108,7 +108,7 @@ class Airlines {
 		}  elseif (substr($flightID, 0, 2) == "SJ" || substr($flightID, 0, 2) == "IN"){
 			$postFare = "id=3300"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3300"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3300"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~SriwijayaAPI|3300|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
 			$response = $this->scraping->request('sriwijayagetfare.html', $this->url . '/api/bookingairlines/ajaxsriwijayaapifare', $postFare);
-			// var_dump($postFare);
+			var_dump($postFare);
 			return $response;
 		} elseif (substr($flightID, 0, 2) == "GA" ){
 			$postFare = "id=2200"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=2200"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=2200"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~GarudaAPI|2200|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
@@ -440,7 +440,7 @@ class Airlines {
 	
 		$postBook = $postBook. "&check_box". $flightnumber_dep ."=" . $this->atrisUrlEncode("1~". $flight_code ."|$flightnumber_dep|". $flight_id . "|" . $route ."|1|" . $date_arranged .  "~" . $class_code . "~" . $value. "~" . $publish . "|" . $tax .  "|" . $total . "|IDR|IDR") . $chkbox_ret;
 	
-		// var_dump( $postBook);
+		var_dump( $postBook);
 
 		$response = $this->scraping->request('citilinkbooking.html', 'https://atris.versatiket.co.id/api/bookingairlines/booking', $postBook);
 		return $response;

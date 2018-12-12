@@ -51,7 +51,7 @@ require "Airlines.php";
 		$return_trip = TRUE;
 	} else $return_trip = FALSE;
 
-	function getBestKey ($airlines, $schedule, $flight_id, $dateBook, $origin, $from_date, $to_date, $price) {
+	function getBestKey ($airlines, $schedule, $flight_id_search, $dateBook, $origin, $from_date, $to_date, $price) {
 		$destination = $_POST['datang'];
 		$adult_num = $_POST['adult_passenger_num'];
 		$child_num = $_POST['child_passenger_num'];
@@ -64,7 +64,7 @@ require "Airlines.php";
 			foreach($schedule as $flightdata) {
 				$flight_id = $flightdata['flight'];
 								
-				if (preg_replace('/[^\da-z]/i', '', $flight_id) != preg_replace('/[^\da-z]/i', '', $flight_id))
+				if (preg_replace('/[^\da-z]/i', '', $flight_id) != preg_replace('/[^\da-z]/i', '', $flight_id_search))
 					continue;
 				
 				$iter = 0;
@@ -73,9 +73,15 @@ require "Airlines.php";
 					if (array_key_exists((string)$iter, $flightdata)) {
 						echo "step 5 <br/>";
 						$value = $flightdata[(string)$iter]['value']; 
+						echo($value . "<br/>");
 						$class_code = $flightdata[(string)$iter]['class'];
+						$seat = $flightdata[(string)$iter]['seat'];
+
+
 					
-						if ($class_code == "BCLP"){
+						if ($class_code == "BCLP" || $seat == '0'){
+
+							echo("Masuk sini Mhanx" . "<br/>");
 							$iter++;
 							continue;
 						}
