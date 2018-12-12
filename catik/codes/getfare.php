@@ -43,6 +43,7 @@ require "Airlines.php";
 	} 
 
 	$origin = $_POST['berangkat'];
+	$destination = $_POST['datang'];
 	$price = $_POST['harga'];
 	$price_ret = $_POST['harga_ret'];
 	
@@ -51,8 +52,8 @@ require "Airlines.php";
 		$return_trip = TRUE;
 	} else $return_trip = FALSE;
 
-	function getBestKey ($airlines, $schedule, $flight_id_search, $dateBook, $origin, $from_date, $to_date, $price) {
-		$destination = $_POST['datang'];
+	function getBestKey ($airlines, $schedule, $flight_id_search, $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_flight = false) {
+		
 		$adult_num = $_POST['adult_passenger_num'];
 		$child_num = $_POST['child_passenger_num'];
 		$infant_num =  $_POST['infant_passenger_num'];
@@ -91,7 +92,11 @@ require "Airlines.php";
 						$longdate = $flightdata['longdate'];
 						$route = $flightdata['route'];
 						
-						$newFare = $airlines->getFare($value, $dateBook, $origin, $flight_id, $destination, $class_code, $time_depart, $time_arrive, $iter, $adult_num, $child_num, $infant_num, $from_date, $to_date, $route, $longdate);
+						if (!$return_flight) {
+							$newFare = $airlines->getFare($value, $dateBook, $origin, $flight_id, $destination, $class_code, $time_depart, $time_arrive, $iter, $adult_num, $child_num, $infant_num, $from_date, $to_date, $route, $longdate);
+						} else {
+							$newFare = $airlines->getFareRet($value, $dateBook, $origin, $flight_id, $destination, $class_code, $time_depart, $time_arrive, $iter, $adult_num, $child_num, $infant_num, $from_date, $to_date, $route, $longdate);
+						}
 
 						if(!array_key_exists('total', $newFare['content']) || !array_key_exists('publish', $newFare['content']) || !array_key_exists('tax', $newFare['content'])){
 							$iter++;
@@ -127,7 +132,7 @@ require "Airlines.php";
 		}
 	}
 	
-	$test = getBestKey($airlines, $schedules['content']['depart_schedule'], $_POST['flightID'], $dateBook, $origin, $from_date, $to_date, $price);
+	$test = getBestKey($airlines, $schedules['content']['depart_schedule'], $_POST['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price);
 	// var_dump($test);
 	$all_result = $test["all_result"] ;
 	$total = $test["total"];
@@ -152,7 +157,7 @@ require "Airlines.php";
 	if (!$return_trip)
 		exit();
 	
-	$test2 = getBestKey($airlines, $schedules['content']['return_schedule'], $_POST['flightID_ret'], $dateBook, $origin, $from_date, $to_date, $price);
+	$test2 = getBestKey($airlines, $schedules['content']['return_schedule'], $_POST['flightID_ret'], $dateBook, $destination, $origin, $from_date, $to_date, $price, $return_flight = true);
 	// var_dump($test2);
 	$all_result_ret = $test2["all_result"] ;
 	$total_ret = $test2["total"];
