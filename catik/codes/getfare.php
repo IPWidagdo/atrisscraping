@@ -6,8 +6,10 @@ require "Airlines.php";
 
 <?php 
 	$airlines = new Airlines();
-	// $airlines->setUserNamePassword("gabon", "Csatversa123");
-	$airlines->setUserNamePassword("ipw", "Vespatia3@");
+	//$airlines->setUserNamePassword("gabon", "Csatversa123");
+	//$airlines->setUserNamePassword("ipw", "Vespatia3@");
+	$airlines->setUserNamePassword("akbaryass", "blokO21");
+
 	$response = $airlines->login();
 
 	if (isset($response['status']) && $response['status'] != 'success') {
@@ -19,6 +21,8 @@ require "Airlines.php";
 	$flight_id_multi = explode("##", $_POST['flightID']);
 	$flight_num = sizeof($flight_id_multi);
 
+	var_dump($flight_num);
+
 	for ($i = 0; $i < $flight_num; $i++) {
 		$flight_array[$i] = $flight_id_multi[$i];
 	}
@@ -26,11 +30,26 @@ require "Airlines.php";
 	$dateBook = $_POST['dateFrom'];	
 	$date_ret = $_POST['date_ret'];
 
+	if ($_POST['flightID_ret'] != "" && $_POST['date_ret'] ) {
+		$return_trip = TRUE;
+	} else $return_trip = FALSE;
+
+	var_dump($return_trip);
+	
+
 	$schedules = $airlines->getAvailability( $dateBook, $_POST['berangkat'], $_POST['datang'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $_POST['date_ret'], $_POST['flightID_ret'], $_POST['flightID']);
-	
-	$foundFlight = false;
-	$foundFlight_ret = false;
-	
+	$is_captcha = $airlines->isCaptchaResponse($schedules);
+	$captcha_image = $airlines->isCaptchaResponse($schedules);
+
+		if ($captcha_image) {
+			$session_id = $airlines->saveSession();
+			header("Location: " . 'getcaptcha.php?captcha=' . $captcha_image . '&session_id='.$session_id . '&booking_id=' . $booking_id, TRUE, 302);
+		
+			$schedules = $airlines->getAvailability( $dateBook, $_POST['berangkat'], $_POST['datang'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $_POST['date_ret'], $_POST['flightID_ret'], $_POST['flightID']);
+		
+		} 
+	//var_dump($schedules);
+
 	if(array_key_exists('depart_schedule', $schedules['content'])){
 		$schedule = $schedules['content']['depart_schedule'];
 		$from_date = $schedules['content']['from_date'];
@@ -47,92 +66,17 @@ require "Airlines.php";
 	$price = $_POST['harga'];
 	$price_ret = $_POST['harga_ret'];
 	
+	if ((substr($_POST['flightID'], 0, 2) == "JT" || substr($_POST['flightID'], 0, 2) == "ID" || substr($_POST['flightID'], 0, 2) == "IW") && ($flight_num > 1)){
+		echo "masuk pertama -_-";
 
-	if ($_POST['flightID_ret'] != "" && $_POST['date_ret'] ) {
-		$return_trip = TRUE;
-	} else $return_trip = FALSE;
-
-	function getBestKey ($airlines, $schedule, $flight_id_search, $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_flight = false) {
+		$test = $airlines->getBestKeyMultiFlight($schedules, $_POST['flightID'], $_POST['berangkat'], $_POST['datang'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $dateBook, $return_trip= FALSE);
 		
-		$adult_num = $_POST['adult_passenger_num'];
-		$child_num = $_POST['child_passenger_num'];
-		$infant_num =  $_POST['infant_passenger_num'];
-
-		$foundFlight = false;
-
-		if (is_array($schedule) || is_object($schedule)) {  
-			// per schedule
-			foreach($schedule as $flightdata) {
-				$flight_id = $flightdata['flight'];
-								
-				if (preg_replace('/[^\da-z]/i', '', $flight_id) != preg_replace('/[^\da-z]/i', '', $flight_id_search))
-					continue;
-				
-				$iter = 0;
-				// per class
-				while ($iter < 50) {
-					if (array_key_exists((string)$iter, $flightdata)) {
-						echo "step 5 <br/>";
-						$value = $flightdata[(string)$iter]['value']; 
-						echo($value . "<br/>");
-						$class_code = $flightdata[(string)$iter]['class'];
-						$seat = $flightdata[(string)$iter]['seat'];
-
-
-					
-						if ($class_code == "BCLP" || $seat == '0'){
-
-							echo("Masuk sini Mhanx" . "<br/>");
-							$iter++;
-							continue;
-						}
-
-						$time_depart = $flightdata['time_depart'];
-						$time_arrive = $flightdata['time_arrive'];
-						$longdate = $flightdata['longdate'];
-						$route = $flightdata['route'];
-						
-						if (!$return_flight) {
-							$newFare = $airlines->getFare($value, $dateBook, $origin, $flight_id, $destination, $class_code, $time_depart, $time_arrive, $iter, $adult_num, $child_num, $infant_num, $from_date, $to_date, $route, $longdate);
-						} else {
-							$newFare = $airlines->getFareRet($value, $dateBook, $origin, $flight_id, $destination, $class_code, $time_depart, $time_arrive, $iter, $adult_num, $child_num, $infant_num, $from_date, $to_date, $route, $longdate);
-						}
-
-						if(!array_key_exists('total', $newFare['content']) || !array_key_exists('publish', $newFare['content']) || !array_key_exists('tax', $newFare['content'])){
-							$iter++;
-							continue;
-						}
-
-						$all_result = $newFare['content']['all_result'];		
-						$total = $newFare['content']['total'];			
-						$publish = $newFare['content']['publish'];
-						$tax = $newFare['content']['tax'];	
-
-						$best_key["all_result"] = $all_result;
-						$best_key["total"] = $total;
-						$best_key["value"] = $value;
-						$best_key["publish"] = $publish;
-						$best_key["tax"] = $tax;
-						$best_key["class_code"] = $class_code;
-						$best_key["route"] = $route;
-						$best_key["time_depart"] = $time_depart;
-						$best_key["time_arrive"] = $time_arrive;
-
-
-						return $best_key;
-					}
-					
-					$iter++;
-				}
-			}
-		}
-
-		if (!$foundFlight) {
-			echo("Price ret not found.");
-		}
+	} else {
+		echo "Masuk kedua";
+	
+		$test = $airlines->getBestKey($schedules['content']['depart_schedule'], $_POST['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_trip= FALSE);
 	}
 	
-	$test = getBestKey($airlines, $schedules['content']['depart_schedule'], $_POST['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price);
 	// var_dump($test);
 	$all_result = $test["all_result"] ;
 	$total = $test["total"];
@@ -144,41 +88,60 @@ require "Airlines.php";
 	$time_depart = $test["time_depart"];
 	$time_arrive = $test["time_arrive"];
 	
-	if (preg_replace('/[^\da-z]/i', '', $_POST['harga']) == preg_replace('/[^\da-z]/i', '', $total) ) {
+	if (preg_replace('/[^\da-z]/i', '', $_POST['harga']) == preg_replace('/[^\da-z]/i', '', $total) && $total != null ) {
 		$response_harga['status'] = "SUCCESS";
 		$response_harga['message'] = "Harga pergi ". $total ." udah ok Pak Eko.";
 		$response_harga['total'] = $total;
 		echo json_encode($response_harga);	
-	} else if (!$foundFlight) {
-		//$airlines->logout();
+	} else if (preg_replace('/[^\da-z]/i', '', $_POST['harga']) != preg_replace('/[^\da-z]/i', '', $total ) && $total != null ) {
+		$response_harga['status'] = "CONFIRM";
+		$response_harga['message'] = "Harga pergi ". $total ." udah ok Pak Eko.";
+		$response_harga['total'] = $total;
+		echo json_encode($response_harga);	
+	} else {
+		$airlines->logout();
 		echo '{"status": "DENIED", "message" : "Gak nemu tuh"}';
 	}
 
-	if (!$return_trip)
-		exit();
-	
-	$test2 = getBestKey($airlines, $schedules['content']['return_schedule'], $_POST['flightID_ret'], $dateBook, $destination, $origin, $from_date, $to_date, $price, $return_flight = true);
-	// var_dump($test2);
-	$all_result_ret = $test2["all_result"] ;
-	$total_ret = $test2["total"];
-	$value_ret = $test2["value"];
-	$publish_ret = $test2["publish"] ;
-	$tax_ret = $test2["tax"];
-	$class_code_ret = $test2["class_code"];
-	$route_ret = $test2["route"];
-	$time_depart_ret = $test2["time_depart"];
-	$time_arrive_ret = $test2["time_arrive"];
 
-	
-	if (preg_replace('/[^\da-z]/i', '', $_POST['harga_ret']) == preg_replace('/[^\da-z]/i', '', $total_ret) ) {
-		$response_harga_ret['status'] = "SUCCESS";
-		$response_harga_ret['message'] = "Harga pulang ". $total_ret ." udah ok Pak Eko.";
-		$response_harga_ret['total'] = $total_ret;
-		echo json_encode($response_harga_ret);	
-	} else if (!$foundFlight) {
-		//$airlines->logout();
-		echo '{"status": "DENIED", "message" : "Ret - Gak nemu tuh"}';
+	if ($_POST['flightID_ret'] != "" && $_POST['date_ret'] ){
+		echo "masuk if gug ea?";
+		if ((substr($_POST['flightID'], 0, 2) == "JT" || substr($_POST['flightID'], 0, 2) == "ID" || substr($_POST['flightID'], 0, 2) == "IW") && $flight_num > 1){
+			$test2 = $airlines->getBestKeyMultiFlight($schedules, $_POST['flightID_ret'], $_POST['datang'], $_POST['berangkat'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $dateBook, $return_trip = TRUE);
+			echo "masuk sini ga?";
+		} else {
+			$test2 = $airlines->getBestKey($schedules['content']['return_schedule'], $_POST['flightID_ret'], $dateBook, $destination, $origin, $from_date, $to_date, $price_ret, $return_trip = true);
+			echo "masuk ke test2";
+		}
+
+		var_dump($test2);
+
+		$all_result_ret = $test2["all_result"] ;
+		$total_ret = $test2["total"];
+		$value_ret = $test2["value"];
+		$publish_ret = $test2["publish"] ;
+		$tax_ret = $test2["tax"];
+		$class_code_ret = $test2["class_code"];
+		$route_ret = $test2["route"];
+		$time_depart_ret = $test2["time_depart"];
+		$time_arrive_ret = $test2["time_arrive"];
+		
+		if (preg_replace('/[^\da-z]/i', '', $_POST['harga_ret']) == preg_replace('/[^\da-z]/i', '', $total_ret)  && $total_ret != null  ) {
+			$response_harga_ret['status'] = "SUCCESS";
+			$response_harga_ret['message'] = "Harga pulang ". $total_ret ." udah ok Pak Eko.";
+			$response_harga_ret['total'] = $total_ret;
+			echo json_encode($response_harga_ret);	
+		} else if (preg_replace('/[^\da-z]/i', '', $_POST['harga_ret']) != preg_replace('/[^\da-z]/i', '', $total_ret)  && $total_ret != null  ) {
+			$response_harga_ret['status'] = "CONFIRM";
+			$response_harga_ret['message'] = "Harga pulang ". $total_ret ." udah ok Pak Eko.";
+			$response_harga_ret['total'] = $total_ret;
+			echo json_encode($response_harga_ret);	
+		} else {
+			//$airlines->logout();
+			echo '{"status": "DENIED", "message" : "Ret - Gak nemu tuh"}';
+		}
 	}
+	
 	
 	$session_id = $airlines->saveSession();
 	

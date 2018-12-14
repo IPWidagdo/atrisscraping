@@ -4,9 +4,12 @@ require "Airlines.php";
 
 <?php	
     if(isset($_POST['cari']) && isset($_POST['lastname']) && isset($_POST['book_code']) && isset($_POST['begin_date']) && isset($_POST['end_date'])){    
-		var_dump($_POST['cari'], $_POST['lastname'], $_POST['book_code'], $_POST['begin_date'], $_POST['end_date']);
+		
+		//var_dump($_POST['cari'], $_POST['lastname'], $_POST['book_code'], $_POST['begin_date'], $_POST['end_date']);
+		
 		$airlines = new Airlines();
 		$airlines->setUserNamePassword("gabon", "Csatversa123");
+		
 		// $airlines->setUserNamePassword("darwin", "Versa020874");		
 		
 		$login = $airlines->login();
