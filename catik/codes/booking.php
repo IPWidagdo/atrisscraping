@@ -6,7 +6,11 @@
 <body>
 <?php
 	require "Airlines.php";
+	
+	$airlines = new Airlines($session_id = $_POST['session_id']);
+
 	//var_dump($_POST);
+	// exit;
 
 	if (!array_key_exists('session_id', $_POST))
 	{
@@ -14,55 +18,114 @@
 		return;
 	}
 
-	$airlines = new Airlines($session_id = $_POST['session_id']);
+	$postencoded = json_encode($_POST);
+	$postencoded = base64_encode($postencoded);
+
+	setcookie("captcha_booking", $postencoded, time() + (3600 * 24), "/"); 
+
+	if ( array_key_exists( 'captcha_code', $_POST) && $_POST['captcha_code'] != NULL){
+		echo "step 1.5";
+		$captcha_code = $_POST['captcha_code'];
+		$send_captcha = $airlines->sendCaptcha($captcha_code);
+
+		echo "var_dump captcha ";
+		var_dump($send_captcha);
+	}
+
+	
+	$cookie_booking = $_COOKIE['captcha_booking'];
+	$cookie_booking = base64_decode($cookie_booking);
+	$cookie_booking = json_decode($cookie_booking);
+	$cookie_booking = $airlines->cvf_convert_object_to_array($cookie_booking);
+
+	echo "VAR DUMP COOKIE BOOKING OI!!";
+	var_dump($cookie_booking);
+	
+	
+	echo "step 2";
+
 	//$airlines->setUserNamePassword("darwin", "Versa020874");
 
-	if (!array_key_exists("adult_passenger_num", $_POST) || !array_key_exists("child_passenger_num", $_POST) && !array_key_exists("infant_passenger_num", $_POST)) {
+	if (!array_key_exists("adult_passenger_num", $cookie_booking) || !array_key_exists("child_passenger_num", $cookie_booking) || !array_key_exists("infant_passenger_num", $cookie_booking)) {
+		echo "step 2.5";
+
+		//var_dump($cookie_booking['child_passenger_num']);
+		
 		echo '{"status" : "DENIED", "message" : "Parameternya kurang bos"}';
 		return;
 	}
 
-	$passenger_num = ((int)$_POST['adult_passenger_num'] + (int)$_POST['child_passenger_num'] + (int)$_POST['infant_passenger_num']);
+	$passenger_num = ((int)$cookie_booking['adult_passenger_num'] + (int)$cookie_booking['child_passenger_num'] + (int)$cookie_booking['infant_passenger_num']);
 
 	/*$data_penumpang = array();
-	foreach ($_POST as $key => $value) {
+	foreach ($cookie_booking as $key => $value) {
 	    echo "Field ".htmlspecialchars($key)." is ".htmlspecialchars($value)."<br>";
 	}
 	*/
 	for ($i=0; $i<$passenger_num; $i++ ) {
-		if ( !array_key_exists('title'.$i, $_POST) || !array_key_exists('fname'.$i, $_POST) || !array_key_exists('lname'.$i, $_POST)) {
+		echo "step 3 for";
+		if ( !array_key_exists('title'.$i, $cookie_booking) || !array_key_exists('fname'.$i, $cookie_booking) || !array_key_exists('lname'.$i, $cookie_booking)) {
+			echo "4";
+			
 			echo '{"status" : "DENIED", "message" : "Parameter penumpangnya kurang bos"}';
 			return;
 		}
 		
-		$data_penumpang[$i]["title"] = $_POST['title'.$i];
-		$data_penumpang[$i]["fname"] = $_POST['fname'.$i];
-		$data_penumpang[$i]["lname"] = $_POST['lname'.$i];
-		$data_penumpang[$i]["date_of_birth"] = $_POST['date_of_birth'.$i];
+		$data_penumpang[$i]["title"] = $cookie_booking['title'.$i];
+		$data_penumpang[$i]["fname"] = $cookie_booking['fname'.$i];
+		$data_penumpang[$i]["lname"] = $cookie_booking['lname'.$i];
+		$data_penumpang[$i]["date_of_birth"] = $cookie_booking['date_of_birth'.$i];
 		
 	} 
 
-	if ($_POST['flight_id_ret'] != NULL) {
-		$return_param = ["flight_id_ret" => $_POST['flight_id_ret'], "route_ret" => $_POST['route_ret'], "date_ret" => $_POST['date_ret'], "class_code_ret" => $_POST['class_code_ret'], "value_ret" => $_POST['value_ret'], "publish_ret" => $_POST['publish_ret'], "tax_ret" => $_POST['tax_ret'], "total_ret" => $_POST['total_ret'],"time_depart_ret" => $_POST['time_depart_ret'], "time_arrive_ret" => $_POST['time_arrive_ret'], "all_result_ret" => $_POST['all_result_ret']];
+	if ($cookie_booking['flight_id_ret'] != NULL) {
+		
+		$return_param = ["flight_id_ret" => $cookie_booking['flight_id_ret'], "route_ret" => $cookie_booking['route_ret'], "date_ret" => $cookie_booking['date_ret'], "class_code_ret" => $cookie_booking['class_code_ret'], "value_ret" => $cookie_booking['value_ret'], "publish_ret" => $cookie_booking['publish_ret'], "tax_ret" => $cookie_booking['tax_ret'], "total_ret" => $cookie_booking['total_ret'],"time_depart_ret" => $cookie_booking['time_depart_ret'], "time_arrive_ret" => $cookie_booking['time_arrive_ret'], "all_result_ret" => $cookie_booking['all_result_ret']];
 
 	} else {
 		$return_param = NULL;
-	} 
-		
-	$newBooking = $airlines->getBooking ($data_penumpang, $_POST['email'], $_POST['phone_number0'], $_POST['value'], $_POST['date_from'], $_POST['berangkat'], $_POST['flight_id'], $_POST['datang'], $_POST['class_code'], $_POST['publish'], $_POST['tax'], $_POST['total'], $_POST['time_depart'], $_POST['time_arrive'], $passenger_num, $_POST['route'], $_POST['time_depart'], $_POST['time_arrive'], $return_param, $all_result = $_POST['all_result'], $_POST['return_trip']);
+	} 	
+	
+	echo "step 5";
+	
+	$new_booking = $airlines->getBooking($data_penumpang, $cookie_booking['email'], $cookie_booking['phone_number0'], $cookie_booking['value'], $cookie_booking['date_from'], $cookie_booking['berangkat'], $cookie_booking['flight_id'], $cookie_booking['datang'], $cookie_booking['class_code'], $cookie_booking['publish'], $cookie_booking['tax'], $cookie_booking['total'], $cookie_booking['time_depart'], $cookie_booking['time_arrive'], $passenger_num, $cookie_booking['route'], $cookie_booking['time_depart'], $cookie_booking['time_arrive'], $return_param, $all_result = $cookie_booking['all_result'], $cookie_booking['return_trip']);
 
-	// $is_captcha = $this->isCaptchaResponse($response);
+	$captcha_image = $airlines->isCaptchaResponse($new_booking);
 
-	// 	if ($captcha_image) {
-	// 		$session_id = $airlines->saveSession();
-	// 		header("Location: " . 'getcaptcha.php?captcha=' . $captcha_image . '&session_id='.$session_id . '&booking_id=' . $booking_id, TRUE, 302);
+	if ($captcha_image) {
+
+		echo "step 6";
+
+		$session_id = $airlines->saveSession();
 		
-	// 		$newBooking = $airlines->getBooking ($data_penumpang, $_POST['email'], $_POST['phone_number0'], $_POST['value'], $_POST['date_from'], $_POST['berangkat'], $_POST['flight_id'], $_POST['datang'], $_POST['class_code'], $_POST['publish'], $_POST['tax'], $_POST['total'], $_POST['time_depart'], $_POST['time_arrive'], $passenger_num, $_POST['route'], $_POST['time_depart'], $_POST['time_arrive'], $return_param, $all_result = $_POST['all_result'], $_POST['return_trip']);
+		$url = 'getcaptcha.php?captcha=' . $captcha_image . '&session_id='. $session_id . '&origin=booking';
+
+		foreach($cookie_booking as $key=>$val) {
+
+			echo "step 7";
+
+			$url = $url . "&" . $key ."=" . $val;
+			var_dump($url);
+			header("Location: " . $url, TRUE, 302);
+			
+		}
+			
+		$airlines->isCaptchaResponse($new_booking);
+		$captcha_image = $airlines->isCaptchaResponse($new_booking);
+
+		if (isset($cookie_booking['captcha_code']) && isset($cookie_booking['session_id']) ){
+
+			echo "step 8";
 		
-	// 	}
-		
-		echo json_encode($newBooking);
-	$airlines->logout();
+			$new_booking = $airlines->getBooking($data_penumpang, $cookie_booking['email'], $cookie_booking['phone_number0'], $cookie_booking['value'], $cookie_booking['date_from'], $cookie_booking['berangkat'], $cookie_booking['flight_id'], $cookie_booking['datang'], $cookie_booking['class_code'], $cookie_booking['publish'], $cookie_booking['tax'], $cookie_booking['total'], $cookie_booking['time_depart'], $cookie_booking['time_arrive'], $passenger_num, $cookie_booking['route'], $cookie_booking['time_depart'], $cookie_booking['time_arrive'], $return_param, $all_result = $cookie_booking['all_result'], $cookie_booking['return_trip']);
+
+		}
+	}
+
+	echo "step 9";
+
+	echo json_encode($new_booking);
+	//$airlines->logout();
 	
 ?>
 </body>

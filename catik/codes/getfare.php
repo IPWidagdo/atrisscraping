@@ -1,27 +1,62 @@
 <?php 
 require "Airlines.php";
 
-//var_dump($_POST);
+// var_dump($_POST);
+// exit;
 ?>
 
 <?php 
 	$airlines = new Airlines();
-	//$airlines->setUserNamePassword("gabon", "Csatversa123");
-	//$airlines->setUserNamePassword("ipw", "Vespatia3@");
-	$airlines->setUserNamePassword("akbaryass", "blokO21");
 
-	$response = $airlines->login();
+	if (array_key_exists('session_id', $_POST))
+	{
+		$airlines = new Airlines($session_id = $_POST['session_id']);
 
+	} else{
+		// $airlines->setUserNamePassword("gabon", "Csatversa123");
+		// $airlines->setUserNamePassword("ipw", "lordgabon");
+		$airlines->setUserNamePassword("Akbaryass", "blokO21");
+
+		$response = $airlines->login();
+	} 
+
+	// kuki
+
+	$postencoded = json_encode($_POST);
+	$postencoded = base64_encode($postencoded);
+	var_dump($postencoded);
+
+	$cookie_availability = $_COOKIE['captcha_availability'];
+	$cookie_availability = base64_decode($cookie_availability);
+	$cookie_availability = json_decode($cookie_availability);
+	var_dump($cookie_availability);
+
+
+	if (array_key_exists('berangkat', $_POST) && array_key_exists('datang', $_POST) && array_key_exists('adult_passenger_num', $_POST) && array_key_exists('flightID', $_POST)){
+		
+		setcookie("captcha_availability", $postencoded, time() + (3600 * 24), "/"); 
+		
+	}
+	
+	if ( array_key_exists( 'captcha_code', $_POST) && $_POST['captcha_code'] != NULL){
+		echo "step 1.5";
+		$captcha_code = $_POST['captcha_code'];
+		$send_captcha = $airlines->sendCaptcha($captcha_code);
+
+		echo "var_dump captcha ";
+		var_dump($send_captcha);
+	}
+	
 	if (isset($response['status']) && $response['status'] != 'success') {
 		echo "Gagal login <br/>";
 		echo json_encode($response);
 		exit();
-		}
+	}
 	
 	$flight_id_multi = explode("##", $_POST['flightID']);
 	$flight_num = sizeof($flight_id_multi);
 
-	var_dump($flight_num);
+	//var_dump($flight_num);
 
 	for ($i = 0; $i < $flight_num; $i++) {
 		$flight_array[$i] = $flight_id_multi[$i];
@@ -34,29 +69,40 @@ require "Airlines.php";
 		$return_trip = TRUE;
 	} else $return_trip = FALSE;
 
-	var_dump($return_trip);
+	//var_dump($return_trip);
+
+	if ( array_key_exists( 'captcha_code', $_POST) && $_POST['captcha_code'] != NULL){
+		echo "step 1.5";
+		$captcha_code = $_POST['captcha_code'];
+		$send_captcha = $airlines->sendCaptcha($captcha_code);
+
+		echo "var_dump captcha ";
+		var_dump($send_captcha);
+	}	
 	
-
 	$schedules = $airlines->getAvailability( $dateBook, $_POST['berangkat'], $_POST['datang'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $_POST['date_ret'], $_POST['flightID_ret'], $_POST['flightID']);
-	$is_captcha = $airlines->isCaptchaResponse($schedules);
+	
 	$captcha_image = $airlines->isCaptchaResponse($schedules);
+	
+	if ($captcha_image) {
 
-		if ($captcha_image) {
-			$session_id = $airlines->saveSession();
-			header("Location: " . 'getcaptcha.php?captcha=' . $captcha_image . '&session_id='.$session_id . '&booking_id=' . $booking_id, TRUE, 302);
-		
-			$schedules = $airlines->getAvailability( $dateBook, $_POST['berangkat'], $_POST['datang'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $_POST['date_ret'], $_POST['flightID_ret'], $_POST['flightID']);
-		
-		} 
+		$session_id = $airlines->saveSession();
+
+		header('Location:getcaptcha.php?captcha=' . $captcha_image . '&session_id='.$session_id . '&origin=getfare', TRUE, 302);
+	
+	} 
+
+
 	//var_dump($schedules);
 
-	if(array_key_exists('depart_schedule', $schedules['content'])){
+	if($schedules['content'] != NULL && array_key_exists('depart_schedule', $schedules['content'])){
 		$schedule = $schedules['content']['depart_schedule'];
 		$from_date = $schedules['content']['from_date'];
 		$to_date = $schedules['content']['to_date'];
 		
-	} else {
-		echo json_encode("{code:'error', 'message':'Your login name is inuse.'}");
+	} 
+	else {
+		echo json_encode("{code: 'error', 'message': 'Array null.'}");
 		$airlines->logout();
 		die;
 	} 
@@ -71,10 +117,26 @@ require "Airlines.php";
 
 		$test = $airlines->getBestKeyMultiFlight($schedules, $_POST['flightID'], $_POST['berangkat'], $_POST['datang'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $dateBook, $return_trip= FALSE);
 		
+		$captcha_image = $airlines->isCaptchaResponse($test);
+		if ($captcha_image) {
+			$session_id = $airlines->saveSession();
+			header("Location: " . 'getcaptcha.php?captcha=' . $captcha_image . '&session_id='.$session_id . '&booking_id=' . $booking_id, TRUE, 302);
+		} 
+		$test = $airlines->getBestKeyMultiFlight($schedules, $_POST['flightID'], $_POST['berangkat'], $_POST['datang'], $_POST['adult_passenger_num'], $_POST['child_passenger_num'], $_POST['infant_passenger_num'], $dateBook, $return_trip= FALSE);
+
 	} else {
+
 		echo "Masuk kedua";
 	
 		$test = $airlines->getBestKey($schedules['content']['depart_schedule'], $_POST['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_trip= FALSE);
+
+		$captcha_image = $airlines->isCaptchaResponse($test);
+		if ($captcha_image) {
+			$session_id = $airlines->saveSession();
+			header("Location: " . 'getcaptcha.php?captcha=' . $captcha_image . '&session_id='.$session_id . '&booking_id=' . $booking_id, TRUE, 302);
+		} 
+		$test = $airlines->getBestKey($schedules['content']['depart_schedule'], $_POST['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_trip= FALSE);
+
 	}
 	
 	// var_dump($test);
@@ -114,7 +176,7 @@ require "Airlines.php";
 			echo "masuk ke test2";
 		}
 
-		var_dump($test2);
+		//var_dump($test2);
 
 		$all_result_ret = $test2["all_result"] ;
 		$total_ret = $test2["total"];
@@ -146,7 +208,6 @@ require "Airlines.php";
 	$session_id = $airlines->saveSession();
 	
 ?>
-
 
 <!DOCTYPE html>
 <html>

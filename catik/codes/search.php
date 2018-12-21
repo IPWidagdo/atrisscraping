@@ -53,6 +53,7 @@ require "Airlines.php";
 		
     } elseif (isset($_POST['captcha_code']) && isset($_POST['session_id']) && isset($_POST['booking_id']) ){
 		$captcha_code = $_POST['captcha_code'];
+		
 		$airlines = new Airlines($session_id = $_POST['session_id']);
 		$airlines->setUserNamePassword("gabon", "Csatversa123");
 		$response_issued = $airlines->issuePayment($_POST['booking_id'], $captcha_code);

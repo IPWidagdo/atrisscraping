@@ -49,7 +49,17 @@ class Airlines {
 		return $response;
 
 	}
-	
+
+	function setCaptchaSession(){
+
+		session_start();
+
+		$booking_session = $_SESSION['post_book'];  
+		//var_dump($booking_session);
+
+		return $booking_session;
+		
+	}
 
 	function getAvailability($depart_date, $origin, $destination, $adult, $child, $infant, $date_ret, $flight_id_ret, $flightID) {
 		if($date_ret !="" && $flight_id_ret != ""){
@@ -65,7 +75,9 @@ class Airlines {
 			$response = $this->scraping->request('citilinkapi.html', $this->url . '/api/bookingairlines/citilinkapi', $postAvailability);
 			return $response;
 		} elseif (substr($flightID, 0, 2) == "JT" || substr($flightID, 0, 2) == "ID" || substr($flightID, 0, 2) == "IW"){
-			$response = $this->scraping->request('lionh2h.html', $this->url . '/api/bookingairlines/lionh2h', $postAvailability);
+			// $response = $this->scraping->request('lionh2h.html', $this->url . '/api/bookingairlines/lionh2h', $postAvailability);
+			$response = $this->scraping->request('lion.html', $this->url . '/api/bookingairlines/lion', $postAvailability);
+			//$response = $this->scraping->request('lion.html', $this->url . '/api/bookingairlines/lion', $postAvailability);
 			return $response;
 		}  elseif (substr($flightID, 0, 2) == "SJ" || substr($flightID, 0, 2) == "IN"){
 			$response = $this->scraping->request('sriwijayaapi.html', $this->url . '/api/bookingairlines/sriwijayaapi', $postAvailability);
@@ -105,17 +117,17 @@ class Airlines {
 				// per class
 				while ($iter >= 0) {
 					if (array_key_exists((string)$iter, $flightdata)) {
-						echo "step 5 <br/>";
+						//echo "step 5 <br/>";
 						$value = $flightdata[(string)$iter]['value']; 
 						echo($value . "<br/>");
 						$class_code = $flightdata[(string)$iter]['class'];
 						$seat = $flightdata[(string)$iter]['seat'];
 
-						var_dump($seat);
+						//var_dump($seat);
 
 						if ($class_code === "BCLP" || $seat === '0' ||  $seat === null){
 
-							echo("Masuk sini Mhanx" . "<br/>");
+							//echo("Masuk sini Mhanx" . "<br/>");
 							$iter--;
 							continue;
 						}
@@ -168,7 +180,7 @@ class Airlines {
 	function getFare($value, $depart_date, $origin, $flightID, $destination, $class_code, $time_depart, $time_arrive, $seq, $adult_passenger_num, $child_passenger_num, $infant_passenger_num, $from_date, $to_date, $route, $longdate) {	
 		if(substr($flightID, 0, 2) == "QG"){
 			$postFare = "id=3400"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3400"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3400"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~CitilinkAPI|3400|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
-			var_dump($postFare);
+			//var_dump($postFare);
 			$response = $this->scraping->request('citilinkgetfare.html', $this->url . '/api/bookingairlines/ajaxcitilinkapifare', $postFare);
 			return $response;
 
@@ -181,7 +193,8 @@ class Airlines {
 
 				$postFare = "id=3000"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3000"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3000"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode($type_flight);
 
-			$response = $this->scraping->request('liongetfare.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $postFare);
+			//$response = $this->scraping->request('lionh2hgetfare.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $postFare);
+			$response = $this->scraping->request('liongetfare.html', $this->url . '/api/bookingairlines/ajaxlionfare', $postFare);
 			// var_dump($postFare);
 			return $response;
 
@@ -189,7 +202,7 @@ class Airlines {
 		}  elseif (substr($flightID, 0, 2) == "SJ" || substr($flightID, 0, 2) == "IN"){
 			$postFare = "id=3300"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3300"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3300"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~SriwijayaAPI|3300|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
 			$response = $this->scraping->request('sriwijayagetfare.html', $this->url . '/api/bookingairlines/ajaxsriwijayaapifare', $postFare);
-			var_dump($postFare);
+			//var_dump($postFare);
 			return $response;
 		} elseif (substr($flightID, 0, 2) == "GA" ){
 			$postFare = "id=2200"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=2200"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=2200"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode("1~GarudaAPI|2200|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0");
@@ -213,10 +226,11 @@ class Airlines {
 		} elseif (substr($flightID_ret, 0, 2) == "JT" || substr($flightID_ret, 0, 2) == "ID" || substr($flightID_ret, 0, 2) == "IW"){
 			$postFare_ret = "id=3050"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=3050"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=3050"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~LionH2H|3050|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
 			// var_dump($postFare_ret);
-			$response = $this->scraping->request('liongetfareret.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $postFare_ret);
+			//$response = $this->scraping->request('lionh2hgetfareret.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $postFare_ret);
+			$response = $this->scraping->request('liongetfareret.html', $this->url . '/api/bookingairlines/ajaxlionfare', $postFare_ret);
 			return $response;
 		} elseif (substr($flightID_ret, 0, 2) == "SJ" || substr($flightID_ret, 0, 2) == "IN"){
-			$postFare_ret = "id=3350"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=3350"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=3350"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~SriwijayaAPI|3350|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
+			$postFare_ret = "id=3350"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=3350"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=3350"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~SriwijayaAPI|3350|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
 			// var_dump($postFare_ret);
 			$response = $this->scraping->request('sriwijayagetfareret.html', $this->url . '/api/bookingairlines/ajaxsriwijayaapifare', $postFare_ret);
 			return $response;
@@ -326,10 +340,12 @@ class Airlines {
 					// var_dump($params_fare_multi);
 
 					if ($return_trip){
-						$newFare = $this->scraping->request('liongetfaremultiret.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $params_fare_multi);
+						//$newFare = $this->scraping->request('lionh2hgetfaremultiret.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $params_fare_multi);
+						$newFare = $this->scraping->request('liongetfaremultiret.html', $this->url . '/api/bookingairlines/ajaxlionfare', $params_fare_multi);
 						// return $response;
 					} else {
-						$newFare = $this->scraping->request('liongetfaremulti.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $params_fare_multi);
+						//$newFare = $this->scraping->request('lionh2hgetfaremulti.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $params_fare_multi);
+						$newFare = $this->scraping->request('liongetfaremulti.html', $this->url . '/api/bookingairlines/ajaxlionfare', $params_fare_multi);
 						// return $response;
 					}
 
@@ -374,11 +390,20 @@ class Airlines {
 			$flightnumber_ret = "3450";
 			$flightnumber_dep = "3400";
 			$flight_code = "CitilinkAPI";
-		}elseif(substr($flight_id, 0, 2) == "JT" || substr($flight_id, 0, 2) == "ID" || substr($flight_id, 0, 2) == "OW" || substr($flight_id, 0, 2) == "IW") {
-			$route_rt = "%2C3050";
-			$flightnumber_ret = "3050";
-			$flightnumber_dep = "3000";
-			$flight_code = "LionH2H";
+		}
+		// elseif(substr($flight_id, 0, 2) == "JT" || substr($flight_id, 0, 2) == "ID" || substr($flight_id, 0, 2) == "OW" || substr($flight_id, 0, 2) == "IW") {
+		// 	$route_rt = "%2C3050";
+		// 	$flightnumber_ret = "3050";
+		// 	$flightnumber_dep = "3000";
+		// 	$flight_code = "LionH2H";
+
+		elseif(substr($flight_id, 0, 2) == "JT" || substr($flight_id, 0, 2) == "ID" || substr($flight_id, 0, 2) == "OW" || substr($flight_id, 0, 2) == "IW") {
+			$route_rt = "%2C50";
+			$flightnumber_ret = "50";
+			$flightnumber_dep = "0";
+			$flight_code = "Lion";
+			
+
 		} elseif(substr($flight_id, 0, 2) == "SJ" || substr($flight_id, 0, 2) == "IN"){
 			$route_rt = "%2C3350";
 			$flightnumber_ret = "3350";
@@ -489,7 +514,7 @@ class Airlines {
 				$type = "Adult";	
 			} 
 
-			var_dump($type);
+			//var_dump($type);
 
 			$postBook = $postBook. "&passenger_title".$i. "=" .$data_penumpang[$i]['title']; 
 			$postBook = $postBook. "&name".$i. "=" .$data_penumpang[$i]['fname']; 
@@ -566,10 +591,9 @@ class Airlines {
 
 
 		} else $postBook = $postBook. "&check_box". $flightnumber_dep ."=" . $this->atrisUrlEncode("1~". $flight_code ."|$flightnumber_dep|". $flight_id . "|" . $route ."|1|" . $date_arranged .  "~" . $class_code . "~" . $value. "~" . $publish . "|" . $tax .  "|" . $total . "|IDR|IDR") . $chkbox_ret;
-	
-		var_dump( $postBook);
-
+		
 		$response = $this->scraping->request('booking.html', $this->url . '/api/bookingairlines/booking', $postBook);
+		var_dump($postBook);
 		return $response;
  	}
 	
@@ -648,13 +672,23 @@ class Airlines {
 		} 
 	}
 
+	function sendCaptcha($captcha_code){
+		$url = $this->url;
+
+		if ($captcha_code != NULL){
+			$lionh2hcaptcha = $this->scraping->request('lioncaptcha.html',  $url . '/api/bookingairlines/captcha', 'captcha=' . $captcha_code); 
+		} 
+
+		$this->checkLogin();
+		return $lionh2hcaptcha;
+	}
+	
+
 	function issuePayment($booking_id, $captcha_code = NULL){
 		$url = $this->url;
 		
-		if ($captcha_code != NULL){
-			$lionh2hcaptcha = $this->scraping->request('lionh2hcaptcha.html',  $url . '/api/bookingairlines/lionh2hcaptcha', 'captcha=' . $captcha_code); 
-		} 
-		
+		$this->sendCaptcha($captcha_code);		
+
 		$post_info_issue = $this->infoBook($booking_id); 
 		$confirmpassword = $this->scraping->request('confirmpassword.html',  $url . '/api/ticketingairlines/confirmpassword', 'id=' . $booking_id);
 
@@ -669,7 +703,7 @@ class Airlines {
 	}
 
 	function isCaptchaResponse( $response ) {
-		if ( array_key_exists('content', $response) && array_key_exists('captcha_string', $response['content']) ) {
+		if (array_key_exists('content', $response) && array_key_exists('captcha_string', $response['content']) && $response['content'] != NULL) {
 			$captcha_string = $response['content']['captcha_string'];
 			$captcha_string = str_replace('data:image/jpg;base64,', '', $captcha_string );
 			$captcha_string = str_replace('\/', '/', $captcha_string );
@@ -678,9 +712,21 @@ class Airlines {
 			$file = 'lionh2hcaptcha' . uniqid() . '.jpeg';
 			$success = file_put_contents($file, $captcha_img);
 			return $file;
-		} else;
+		} else return false;
+	}
 
-		return false;
+	function cvf_convert_object_to_array($data) {
+
+		if (is_object($data)) {
+			$data = get_object_vars($data);
+		}
+	
+		if (is_array($data)) {
+			return array_map(__METHOD__, $data);
+		}
+		else {
+			return $data;
+		}
 	}
 }
 ?>
