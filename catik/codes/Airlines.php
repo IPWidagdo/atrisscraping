@@ -97,11 +97,11 @@ class Airlines {
 		return $params;
 	}
 
-	function getBestKey ($schedule, $flight_id_search, $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_flight = false) {
+	function getBestKey ($adult_num, $child_num, $infant_num, $schedule, $flight_id_search, $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_flight = false) {
 		
-		$adult_num = $_POST['adult_passenger_num'];
-		$child_num = $_POST['child_passenger_num'];
-		$infant_num =  $_POST['infant_passenger_num'];
+		// $adult_num = $_POST['adult_passenger_num'];
+		// $child_num = $_POST['child_passenger_num'];
+		// $infant_num =  $_POST['infant_passenger_num'];
 
 		$foundFlight = false;
 
@@ -186,9 +186,13 @@ class Airlines {
 
 		} elseif (substr($flightID, 0, 2) == "JT" || substr($flightID, 0, 2) == "ID" || substr($flightID, 0, 2) == "IW"){
 			if(strlen($flightID>10)){
-				$type_flight = "2~LionH2H|3000|" . $flightID0 . "|" . $route0. "|1|" . $time_depart0 . "|" . $time_arrive0 . "~" . $class_code0 . "|" . $flightID1 . "|" . $route1. "|1|" . $time_depart1 . "|" . $time_arrive1 . "~" . $class_code1 . "~" . $value_transit . "~0|0|0";
+				//$type_flight = "2~LionH2H|3000|" . $flightID0 . "|" . $route0. "|1|" . $time_depart0 . "|" . $time_arrive0 . "~" . $class_code0 . "|" . $flightID1 . "|" . $route1. "|1|" . $time_depart1 . "|" . $time_arrive1 . "~" . $class_code1 . "~" . $value_transit . "~0|0|0";
+				$type_flight = "2~Lion|0|" . $flightID0 . "|" . $route0. "|1|" . $time_depart0 . "|" . $time_arrive0 . "~" . $class_code0 . "|" . $flightID1 . "|" . $route1. "|1|" . $time_depart1 . "|" . $time_arrive1 . "~" . $class_code1 . "~" . $value_transit . "~0|0|0";
+			
 			} else {
-				$type_flight = "1~LionH2H|3000|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0";
+				//$type_flight = "1~LionH2H|3000|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0";
+				$type_flight = "1~Lion|0|" . $flightID . "|" . $route. "|1|" . $time_depart . "|" . $time_arrive . "~" . $class_code . "~" . $value . "~0|0|0";
+
 			}
 
 				$postFare = "id=3000"."&choice=".$this->atrisUrlEncode($value)."&date=".$longdate . "&from_date=". $this->atrisUrlEncode($time_depart) ."&to_date=". $this->atrisUrlEncode($time_arrive) ."&from_code=".$origin."&to_code=".$destination."&adult=". $adult_passenger_num ."&child=". $child_passenger_num ."&infant=". $infant_passenger_num ."&row=3000"."&class_code=". $this->atrisUrlEncode($class_code)."&chkbox=3000"."&seq=".$seq."&defcurr=IDR&info=". $this->atrisUrlEncode($type_flight);
@@ -224,7 +228,9 @@ class Airlines {
 			return $response;
 		
 		} elseif (substr($flightID_ret, 0, 2) == "JT" || substr($flightID_ret, 0, 2) == "ID" || substr($flightID_ret, 0, 2) == "IW"){
-			$postFare_ret = "id=3050"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=3050"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=3050"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~LionH2H|3050|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
+			$postFare_ret = "id=3050"."&choice=".$this->atrisUrlEncode($value_ret)."&date=".$longdate_ret."&from_date=".$this->atrisUrlEncode($time_depart_ret)."&to_date=".$this->atrisUrlEncode($time_arrive_ret)."&from_code=".$origin_ret."&to_code=".$destination_ret."&adult=". $adult_passenger_num_ret ."&child=". $child_passenger_num_ret ."&infant=". $infant_passenger_num_ret ."&row=3050"."&class_code=".$this->atrisUrlEncode($class_code_ret)."&chkbox=3050"."&seq=".$seq_ret."&defcurr=IDR&info=". $this->atrisUrlEncode("1~Lion|50|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
+			
+			//$this->atrisUrlEncode("1~LionH2H|3050|" . $flightID_ret . "|" . $route_ret . "|1|" . $time_depart_ret . "|" . $time_arrive_ret . "~" . $class_code_ret . "~" . $value_ret . "~0|0|0");
 			// var_dump($postFare_ret);
 			//$response = $this->scraping->request('lionh2hgetfareret.html', $this->url . '/api/bookingairlines/ajaxlionh2hfare', $postFare_ret);
 			$response = $this->scraping->request('liongetfareret.html', $this->url . '/api/bookingairlines/ajaxlionfare', $postFare_ret);
@@ -322,7 +328,7 @@ class Airlines {
 							$pertamax = false;
 						}						
 
-						$temp_route_param = $temp_route_param . $this->atrisUrlEncode( "LionH2H|3000|"  . $flight_id_att . "|" . $route_att . "|1|" . $time_depart_att . "|" . $time_arrive_att ) . "~" ;
+						$temp_route_param = $temp_route_param . $this->atrisUrlEncode( /*"LionH2H|3000|" */ "Lion|0|"  . $flight_id_att . "|" . $route_att . "|1|" . $time_depart_att . "|" . $time_arrive_att ) . "~" ;
 						$temp_class_param = $temp_class_param . $class_code ."~" ;
 						$temp_value_param = $temp_value_param . $value . "~";
 						// echo("step 8". $each_schedule[(string)$iter]['class']."<br/>");
@@ -373,14 +379,14 @@ class Airlines {
 		// echo "Gak dapet harga. :(((";
 	}
 
-	function getBooking($data_penumpang, $email, $phone_number0, $value, $depart_date, $origin, $flight_id, $destination, $class_code, $publish, $tax, $total, $from_date, $to_date, $passenger_num, $route, $time_depart, $time_arrive, $return_param, $all_result = NULL, $return_trip = FALSE) {
+	function getBooking($adult_num, $child_num, $infant_num, $data_penumpang, $email, $phone_number0, $value, $depart_date, $origin, $flight_id, $destination, $class_code, $publish, $tax, $total, $from_date, $to_date, $passenger_num, $route, $time_depart, $time_arrive, $return_param, $all_result = NULL, $return_trip = FALSE) {
 		$depart_date = new DateTime($depart_date);
 		$monthFirst = $depart_date->format('m-d-Y');
 		$dayFirst = $depart_date->format('d-m-Y');
 		$yearFirst = $depart_date->format('Y-m-d');
 		$epochdate = $depart_date->format('U');
 		$flight_id = str_replace('/\s+/', '  ', $flight_id);
-		$passenger_num = ((int)$_POST['adult_passenger_num'] + (int)$_POST['child_passenger_num'] + (int)$_POST['infant_passenger_num']);
+		$passenger_num = ((int)$adult_num + (int)$child_num + (int)$infant_num);
 
 		$flight_id_multi = explode("##", $flight_id);
 		$flight_num = sizeof($flight_id_multi);
@@ -593,7 +599,7 @@ class Airlines {
 		} else $postBook = $postBook. "&check_box". $flightnumber_dep ."=" . $this->atrisUrlEncode("1~". $flight_code ."|$flightnumber_dep|". $flight_id . "|" . $route ."|1|" . $date_arranged .  "~" . $class_code . "~" . $value. "~" . $publish . "|" . $tax .  "|" . $total . "|IDR|IDR") . $chkbox_ret;
 		
 		$response = $this->scraping->request('booking.html', $this->url . '/api/bookingairlines/booking', $postBook);
-		var_dump($postBook);
+		// var_dump($postBook);
 		return $response;
  	}
 	
