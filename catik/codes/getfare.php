@@ -8,21 +8,13 @@ $airlines = new Airlines();
 
 	// if (array_key_exists('berangkat', $_POST) && array_key_exists('datang', $_POST) && array_key_exists('adult_passenger_num', $_POST) && array_key_exists('flightID', $_POST)){
 	
-		$postencoded = json_encode($_POST);
-		$postencoded = base64_encode($postencoded);
-		var_dump($postencoded);
+		
 
-		setcookie("captcha_availability", $postencoded, time() + (3600 * 24), "/"); 
-
-		$cookie_availability = $_COOKIE['captcha_availability'];
-		$cookie_availability = base64_decode($cookie_availability);
-		$cookie_availability = json_decode($cookie_availability);
-		$cookie_availability = $airlines->cvf_convert_object_to_array($cookie_availability);
-
+	// 	// var_dump($fwrite_availability);
+	// 	// exit;
+		
 	// }
 
-// var_dump($_POST);
-// exit;
 ?>
 
 <?php 	
@@ -32,17 +24,12 @@ $airlines = new Airlines();
 		$airlines = new Airlines($session_id = $_POST['session_id']);
 
 	} else{
-		foreach ($_COOKIE as $key => $value) {
-			echo $key;
-			unset($_COOKIE[$key]);
-		}
 
 		// $airlines->setUserNamePassword("gabon", "Csatversa123");
 		// $airlines->setUserNamePassword("ipw", "lordgabon");
 		$airlines->setUserNamePassword("Akbaryass", "blokO21");
 
 		echo "sini oyykajdhf";
-		var_dump($_COOKIE);
 
 		$response = $airlines->login();
 	} 
@@ -54,7 +41,20 @@ $airlines = new Airlines();
 
 		echo "var_dump captcha ";
 		var_dump($send_captcha);
+	} else {
+		$postencoded = json_encode($_POST);
+		$postencoded = base64_encode($postencoded);
+		//var_dump($postencoded);
+
+		//setcookie("captcha_availability", $postencoded, time() + (3600 * 24), "/"); 
+		$fopen = fopen('getfare_captcha.txt', 'w+');
+		$fwrite_availability = fwrite($fopen, $postencoded);
 	}
+
+		$fwrite_availability = file_get_contents('getfare_captcha.txt');	
+		$fwrite_availability = base64_decode($fwrite_availability);
+		$fwrite_availability = json_decode($fwrite_availability);
+		$fwrite_availability = $airlines->convert_object_to_array($fwrite_availability);
 	
 	if (isset($response['status']) && $response['status'] != 'success') {
 		echo "Gagal login <br/>";
@@ -62,7 +62,7 @@ $airlines = new Airlines();
 		exit();
 	}
 	
-	$flight_id_multi = explode("##", $cookie_availability['flightID']);
+	$flight_id_multi = explode("##", $fwrite_availability['flightID']);
 	$flight_num = sizeof($flight_id_multi);
 
 	//var_dump($flight_num);
@@ -71,10 +71,10 @@ $airlines = new Airlines();
 		$flight_array[$i] = $flight_id_multi[$i];
 	}
 
-	$dateBook = $cookie_availability['dateFrom'];	
-	$date_ret = $cookie_availability['date_ret'];
+	$dateBook = $fwrite_availability['dateFrom'];	
+	$date_ret = $fwrite_availability['date_ret'];
 
-	if ($cookie_availability['flightID_ret'] != "" && $cookie_availability['date_ret'] ) {
+	if ($fwrite_availability['flightID_ret'] != "" && $fwrite_availability['date_ret'] ) {
 		$return_trip = TRUE;
 	} else $return_trip = FALSE;
 
@@ -89,7 +89,7 @@ $airlines = new Airlines();
 		var_dump($send_captcha);
 	}	
 	
-	$schedules = $airlines->getAvailability( $dateBook, $cookie_availability['berangkat'], $cookie_availability['datang'], $cookie_availability['adult_passenger_num'], $cookie_availability['child_passenger_num'], $cookie_availability['infant_passenger_num'], $cookie_availability['date_ret'], $cookie_availability['flightID_ret'], $cookie_availability['flightID']);
+	$schedules = $airlines->getAvailability( $dateBook, $fwrite_availability['berangkat'], $fwrite_availability['datang'], $fwrite_availability['adult_passenger_num'], $fwrite_availability['child_passenger_num'], $fwrite_availability['infant_passenger_num'], $fwrite_availability['date_ret'], $fwrite_availability['flightID_ret'], $fwrite_availability['flightID']);
 	
 	$captcha_image = $airlines->isCaptchaResponse($schedules);
 	
@@ -116,28 +116,28 @@ $airlines = new Airlines();
 		die;
 	} 
 
-	$origin = $cookie_availability['berangkat'];
-	$destination = $cookie_availability['datang'];
-	$price = $cookie_availability['harga'];
-	$price_ret = $cookie_availability['harga_ret'];
+	$origin = $fwrite_availability['berangkat'];
+	$destination = $fwrite_availability['datang'];
+	$price = $fwrite_availability['harga'];
+	$price_ret = $fwrite_availability['harga_ret'];
 	
-	if ((substr($cookie_availability['flightID'], 0, 2) == "JT" || substr($cookie_availability['flightID'], 0, 2) == "ID" || substr($cookie_availability['flightID'], 0, 2) == "IW") && ($flight_num > 1)){
+	if ((substr($fwrite_availability['flightID'], 0, 2) == "JT" || substr($fwrite_availability['flightID'], 0, 2) == "ID" || substr($fwrite_availability['flightID'], 0, 2) == "IW") && ($flight_num > 1)){
 		echo "masuk pertama -_-";
 
-		$test = $airlines->getBestKeyMultiFlight($schedules, $cookie_availability['flightID'], $cookie_availability['berangkat'], $cookie_availability['datang'], $cookie_availability['adult_passenger_num'], $cookie_availability['child_passenger_num'], $cookie_availability['infant_passenger_num'], $dateBook, $return_trip= FALSE);
+		$test = $airlines->getBestKeyMultiFlight($schedules, $fwrite_availability['flightID'], $fwrite_availability['berangkat'], $fwrite_availability['datang'], $fwrite_availability['adult_passenger_num'], $fwrite_availability['child_passenger_num'], $fwrite_availability['infant_passenger_num'], $dateBook, $return_trip= FALSE);
 		
 		$captcha_image = $airlines->isCaptchaResponse($test);
 		if ($captcha_image) {
 			$session_id = $airlines->saveSession();
 			header("Location: " . 'getcaptcha.php?captcha=' . $captcha_image . '&session_id='.$session_id . '&booking_id=' . $booking_id, TRUE, 302);
 		} 
-		$test = $airlines->getBestKeyMultiFlight($schedules, $cookie_availability['flightID'], $cookie_availability['berangkat'], $cookie_availability['datang'], $cookie_availability['adult_passenger_num'], $cookie_availability['child_passenger_num'], $cookie_availability['infant_passenger_num'], $dateBook, $return_trip= FALSE);
+		$test = $airlines->getBestKeyMultiFlight($schedules, $fwrite_availability['flightID'], $fwrite_availability['berangkat'], $fwrite_availability['datang'], $fwrite_availability['adult_passenger_num'], $fwrite_availability['child_passenger_num'], $fwrite_availability['infant_passenger_num'], $dateBook, $return_trip= FALSE);
 
 	} else {
 
 		echo "Masuk kedua";
 	
-		$test = $airlines->getBestKey($cookie_availability['adult_passenger_num'], $cookie_availability['child_passenger_num'], $cookie_availability['infant_passenger_num'], $schedules['content']['depart_schedule'], $cookie_availability['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_trip= FALSE);
+		$test = $airlines->getBestKey($fwrite_availability['adult_passenger_num'], $fwrite_availability['child_passenger_num'], $fwrite_availability['infant_passenger_num'], $schedules['content']['depart_schedule'], $fwrite_availability['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_trip= FALSE);
 
 		$captcha_image = $airlines->isCaptchaResponse($test);
 		if ($captcha_image) {
@@ -145,7 +145,7 @@ $airlines = new Airlines();
 			header("Location: " . 'getcaptcha.php?captcha=' . $captcha_image . '&session_id='.$session_id . '&booking_id=' . $booking_id, TRUE, 302);
 		} 
 		
-		//$test = $airlines->getBestKey($schedules['content']['depart_schedule'], $cookie_availability['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_trip= FALSE);
+		//$test = $airlines->getBestKey($schedules['content']['depart_schedule'], $fwrite_availability['flightID'], $dateBook, $origin, $destination, $from_date, $to_date, $price, $return_trip= FALSE);
 
 	}
 	
@@ -160,15 +160,18 @@ $airlines = new Airlines();
 	$time_depart = $test["time_depart"];
 	$time_arrive = $test["time_arrive"];
 	
-	if (preg_replace('/[^\da-z]/i', '', $cookie_availability['harga']) == preg_replace('/[^\da-z]/i', '', $total) && $total != null ) {
+	if (preg_replace('/[^\da-z]/i', '', $fwrite_availability['harga']) == preg_replace('/[^\da-z]/i', '', $total) && $total != null ) {
 		$response_harga['status'] = "SUCCESS";
 		$response_harga['message'] = "Harga pergi ". $total ." udah ok Pak Eko.";
 		$response_harga['total'] = $total;
 		echo json_encode($response_harga);	
-	} else if (preg_replace('/[^\da-z]/i', '', $cookie_availability['harga']) != preg_replace('/[^\da-z]/i', '', $total ) && $total != null ) {
+	} else if (preg_replace('/[^\da-z]/i', '', $fwrite_availability['harga']) != preg_replace('/[^\da-z]/i', '', $total ) && $total != null ) {
 		$response_harga['status'] = "CONFIRM";
 		$response_harga['message'] = "Harga pergi ". $total ." udah ok Pak Eko.";
 		$response_harga['total'] = $total;
+
+		$airlines->logout();
+
 		echo json_encode($response_harga);	
 	} else {
 		$airlines->logout();
@@ -176,13 +179,13 @@ $airlines = new Airlines();
 	}
 
 
-	if ($cookie_availability['flightID_ret'] != "" && $cookie_availability['date_ret'] ){
+	if ($fwrite_availability['flightID_ret'] != "" && $fwrite_availability['date_ret'] ){
 		echo "masuk if gug ea?";
-		if ((substr($cookie_availability['flightID'], 0, 2) == "JT" || substr($cookie_availability['flightID'], 0, 2) == "ID" || substr($cookie_availability['flightID'], 0, 2) == "IW") && $flight_num > 1){
-			$test2 = $airlines->getBestKeyMultiFlight($schedules, $cookie_availability['flightID_ret'], $cookie_availability['datang'], $cookie_availability['berangkat'], $cookie_availability['adult_passenger_num'], $cookie_availability['child_passenger_num'], $cookie_availability['infant_passenger_num'], $dateBook, $return_trip = TRUE);
+		if ((substr($fwrite_availability['flightID'], 0, 2) == "JT" || substr($fwrite_availability['flightID'], 0, 2) == "ID" || substr($fwrite_availability['flightID'], 0, 2) == "IW") && $flight_num > 1){
+			$test2 = $airlines->getBestKeyMultiFlight($schedules, $fwrite_availability['flightID_ret'], $fwrite_availability['datang'], $fwrite_availability['berangkat'], $fwrite_availability['adult_passenger_num'], $fwrite_availability['child_passenger_num'], $fwrite_availability['infant_passenger_num'], $dateBook, $return_trip = TRUE);
 			echo "masuk sini ga?";
 		} else {
-			$test2 = $airlines->getBestKey($schedules['content']['return_schedule'], $cookie_availability['flightID_ret'], $dateBook, $destination, $origin, $from_date, $to_date, $price_ret, $return_trip = true);
+			$test2 = $airlines->getBestKey($schedules['content']['return_schedule'], $fwrite_availability['flightID_ret'], $dateBook, $destination, $origin, $from_date, $to_date, $price_ret, $return_trip = true);
 			echo "masuk ke test2";
 		}
 
@@ -197,13 +200,15 @@ $airlines = new Airlines();
 		$route_ret = $test2["route"];
 		$time_depart_ret = $test2["time_depart"];
 		$time_arrive_ret = $test2["time_arrive"];
-		
-		if (preg_replace('/[^\da-z]/i', '', $cookie_availability['harga_ret']) == preg_replace('/[^\da-z]/i', '', $total_ret)  && $total_ret != null  ) {
+
+		// var_dump($fwrite_availability['harga_ret'] . "=" . $total_ret );
+		// exit;
+		if (preg_replace('/[^\da-z]/i', '', $fwrite_availability['harga_ret']) == preg_replace('/[^\da-z]/i', '', $total_ret)  && $total_ret != null  ) {
 			$response_harga_ret['status'] = "SUCCESS";
 			$response_harga_ret['message'] = "Harga pulang ". $total_ret ." udah ok Pak Eko.";
 			$response_harga_ret['total'] = $total_ret;
 			echo json_encode($response_harga_ret);	
-		} else if (preg_replace('/[^\da-z]/i', '', $cookie_availability['harga_ret']) != preg_replace('/[^\da-z]/i', '', $total_ret)  && $total_ret != null  ) {
+		} else if (preg_replace('/[^\da-z]/i', '', $fwrite_availability['harga_ret']) != preg_replace('/[^\da-z]/i', '', $total_ret)  && $total_ret != null  ) {
 			$response_harga_ret['status'] = "CONFIRM";
 			$response_harga_ret['message'] = "Harga pulang ". $total_ret ." udah ok Pak Eko.";
 			$response_harga_ret['total'] = $total_ret;
@@ -272,7 +277,7 @@ $airlines = new Airlines();
 		</div>
 
 <?php
-	$passenger_num = ((int)$cookie_availability['adult_passenger_num'] + (int)$cookie_availability['child_passenger_num'] + (int)$cookie_availability['infant_passenger_num']);
+	$passenger_num = ((int)$fwrite_availability['adult_passenger_num'] + (int)$fwrite_availability['child_passenger_num'] + (int)$fwrite_availability['infant_passenger_num']);
 	for ($i=0; $i<$passenger_num; $i++ ){
 		echo 
 		"<div><br>Title : <input type='text' name='title".$i."'></div>

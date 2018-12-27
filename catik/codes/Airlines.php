@@ -310,12 +310,19 @@ class Airlines {
 							continue;
 						}
 
+						$value = $each_schedule[(string)$iter]['value']; 
+						$class_code = $each_schedule[(string)$iter]['class'];
+
+						if($flight_num > 1 && $availability['message'] == 'LION success' && ($class_code == "U" || $class_code == "O" || $class_code == "R" || $class_code == "X"	 || $class_code == "V"  || $class_code == "T" || $class_code == "Q")){
+
+							continue;
+						}
+
 						// ambil param kursi tersedia
 						// echo("step 7<br/>");
 						// var_dump($each_schedule[(string)$iter]);
 
-						$value = $each_schedule[(string)$iter]['value']; 
-						$class_code = $each_schedule[(string)$iter]['class'];
+						
 						$time_depart_att = $each_schedule['time_depart'];
 						$time_arrive_att = $each_schedule['time_arrive'];
 						$longdate_att = $each_schedule['longdate'];
@@ -494,9 +501,9 @@ class Airlines {
 			$chkbox_ret = "";
 		};
 
-		$postBook = "route=" . $flightnumber_dep .$route_rt."&from_code=".$origin."&to_code=". $destination ."&return_code=". $return_code ."&from_date=".$dayFirst."&to_date=". $dayFirst ."&count_passenger=". $passenger_num ."&adult=".(int)$_POST['adult_passenger_num']."&child=". (int)$_POST['child_passenger_num'] ."&infant=". (int)$_POST['infant_passenger_num'];
+		$postBook = "route=" . $flightnumber_dep .$route_rt."&from_code=".$origin."&to_code=". $destination ."&return_code=". $return_code ."&from_date=".$dayFirst."&to_date=". $dayFirst ."&count_passenger=". $passenger_num ."&adult=". $adult_num ."&child=". $child_num ."&infant=". $infant_num;
 		
-		$parent_quota = (int)$_POST['adult_passenger_num'];
+		$parent_quota = $adult_num;
 		$parent_iter = 1;
 
 		for ($i=0; $i<$passenger_num; $i++ ) {
@@ -599,7 +606,7 @@ class Airlines {
 		} else $postBook = $postBook. "&check_box". $flightnumber_dep ."=" . $this->atrisUrlEncode("1~". $flight_code ."|$flightnumber_dep|". $flight_id . "|" . $route ."|1|" . $date_arranged .  "~" . $class_code . "~" . $value. "~" . $publish . "|" . $tax .  "|" . $total . "|IDR|IDR") . $chkbox_ret;
 		
 		$response = $this->scraping->request('booking.html', $this->url . '/api/bookingairlines/booking', $postBook);
-		// var_dump($postBook);
+		//var_dump($postBook);
 		return $response;
  	}
 	
@@ -721,7 +728,7 @@ class Airlines {
 		} else return false;
 	}
 
-	function cvf_convert_object_to_array($data) {
+	function convert_object_to_array($data) {
 
 		if (is_object($data)) {
 			$data = get_object_vars($data);
